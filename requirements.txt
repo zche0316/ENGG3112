@@ -1,8 +1,8 @@
-pandas
-numpy
-geopandas
-osmnx
-networkx
-folium
-shapely
-sklearn
+pandas>=2.2.0
+numpy>=1.26.0
+geopandas>=0.14.0
+osmnx>=1.9.0
+networkx>=3.2.1
+folium>=0.15.1
+shapely>=2.0.2
+scikit-learn>=1.4.0
