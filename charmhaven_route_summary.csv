@@ -1,2 +1,2 @@
 ﻿zone,dataset_path,selected_defects,total_distance_km,base_travel_time_min,simulated_travel_time_min,traffic_delay_total_min,service_time_min,estimated_total_time_min,estimated_total_fuel_cost_aud
-Charmhaven Zone,Dataset/potholes_clean.csv,99,220.16,330.3,344.1,13.8,4890,5234.1,51.9
+Charmhaven Zone,Dataset/potholes_clean.csv,99,217.61,211.7,219.9,8.2,4890,5109.9,51.3

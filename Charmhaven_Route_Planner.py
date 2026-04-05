@@ -75,6 +75,143 @@ PEAK_WINDOWS = {
     "freight_peak": (9.0, 15.0),
 }
 
+# Historical crash casualty hotspots from NSW iROADS / Power BI 2024 data,
+# manually digitised and reverse-geocoded. Schema: degree-of-casualty classification.
+ACCIDENT_HOTSPOTS = [
+    {"lat": -33.26839, "lon": 151.33731, "casualty": "Seriously Injured", "road": "Yarramalong Road, Wyong Creek"},
+    # ── Wadalba / Alison / B70 W ─────────────────────
+    {"lat": -33.26121, "lon": 151.42656, "casualty": "Seriously Injured", "road": "Brittania Drive, Watanobbi"},
+    {"lat": -33.26284, "lon": 151.42999, "casualty": "Moderately Injured", "road": "Kitty Place, Watanobbi"},
+    {"lat": -33.26397, "lon": 151.42883, "casualty": "Seriously Injured", "road": "Brittania Drive, Watanobbi"},
+    {"lat": -33.26597, "lon": 151.42724, "casualty": "Moderately Injured", "road": "Harrington Close, Watanobbi"},
+    {"lat": -33.26688, "lon": 151.43207, "casualty": "Seriously Injured", "road": "Golf Links Drive, Watanobbi"},
+    {"lat": -33.26759, "lon": 151.43123, "casualty": "Moderately Injured", "road": "Brittania Drive, Watanobbi"},
+    {"lat": -33.26858, "lon": 151.43558, "casualty": "Moderately Injured", "road": "Pacific Highway, Wyong"},
+    {"lat": -33.27062, "lon": 151.43136, "casualty": "Moderately Injured", "road": "Pacific Highway, Watanobbi"},
+    {"lat": -33.27436, "lon": 151.42964, "casualty": "Seriously Injured", "road": "Pacific Highway, Watanobbi"},  # 2 events
+    {"lat": -33.27597, "lon": 151.42690, "casualty": "Moderately Injured", "road": "Cutler Drive, Watanobbi"},
+    {"lat": -33.27229, "lon": 151.42539, "casualty": "Seriously Injured", "road": "Cutler Drive, Watanobbi"},
+    {"lat": -33.27761, "lon": 151.42430, "casualty": "Minor/Other Injured", "road": "Chapman Avenue, Wyong"},
+    {"lat": -33.27781, "lon": 151.42495, "casualty": "Moderately Injured", "road": "Crystal Crescent, Wyong"},
+    # ── Wyong area ───────────────────────────────────
+    {"lat": -33.28117, "lon": 151.42193, "casualty": "Moderately Injured", "road": "Anzac Avenue, Wyong"},
+    # ── Jilliby / local roads ────────────────────────
+    {"lat": -33.26974, "lon": 151.40560, "casualty": "Moderately Injured", "road": "Pacific Motorway, Wyong"},
+    {"lat": -33.25947, "lon": 151.40358, "casualty": "Seriously Injured", "road": "Pacific Motorway, Alison"},  # 3 events
+    {"lat": -33.26115, "lon": 151.39398, "casualty": "Seriously Injured", "road": "Jilliby Road, Alison"},
+    {"lat": -33.25730, "lon": 151.39746, "casualty": "Minor/Other Injured", "road": "Hue Hue Road, Jilliby"},
+    {"lat": -33.25312, "lon": 151.39735, "casualty": "Seriously Injured", "road": "Hue Hue Road, Jilliby"},
+    {"lat": -33.26920, "lon": 151.44015, "casualty": "Seriously Injured", "road": "Pacific Highway, Wyong"},  # 2 events
+    {"lat": -33.26939, "lon": 151.44145, "casualty": "Moderately Injured", "road": "Pacific Highway, Wyong"},
+    {"lat": -33.26987, "lon": 151.44458, "casualty": "Seriously Injured", "road": "Pacific Highway, Wyong"},
+    {"lat": -33.26694, "lon": 151.44536, "casualty": "Moderately Injured", "road": "Donaldson Street, Wyong"},
+    {"lat": -33.27185, "lon": 151.37291, "casualty": "Seriously Injured", "road": "Yarramalong Road, Wyong Creek"},
+    {"lat": -33.26293, "lon": 151.52131, "casualty": "Minor/Other Injured", "road": "Main Road, Toukley"},
+    {"lat": -33.26262, "lon": 151.52349, "casualty": "Seriously Injured", "road": "Viewpoint Drive, Toukley"},
+    {"lat": -33.26423, "lon": 151.53454, "casualty": "Moderately Injured", "road": "Dunleigh Street, Toukley"},
+    # ── Noraville S / Budgewoi Rd south ──────────────
+    {"lat": -33.26500, "lon": 151.54200, "casualty": "Seriously Injured", "road": "Victoria Avenue, Toukley"},
+    {"lat": -33.26677, "lon": 151.54671, "casualty": "Moderately Injured", "road": "Heador Street, Toukley"},  # 2 events
+    # ── Charmhaven / Hamlyn Terrace / B70 ────────────
+    {"lat": -33.26578, "lon": 151.46510, "casualty": "Minor/Other Injured", "road": "Orchid Way, Wadalba"},
+    {"lat": -33.26266, "lon": 151.46471, "casualty": "Seriously Injured", "road": "Minnesota Road, Hamlyn Terrace"},  # 5 events
+    {"lat": -33.26189, "lon": 151.46486, "casualty": "Moderately Injured", "road": "Minnesota Road, Hamlyn Terrace"},
+    {"lat": -33.26175, "lon": 151.45716, "casualty": "Killed", "road": "Pacific Highway, Wadalba"},  # 2 events
+    {"lat": -33.26547, "lon": 151.45519, "casualty": "Seriously Injured", "road": "Wadalba"},
+    {"lat": -33.25010, "lon": 151.46734, "casualty": "Moderately Injured", "road": "Warnervale Road, Hamlyn Terrace"},
+    {"lat": -33.25137, "lon": 151.47574, "casualty": "Moderately Injured", "road": "Louisiana Road, Hamlyn Terrace"},
+    {"lat": -33.25157, "lon": 151.47720, "casualty": "Moderately Injured", "road": "Warnervale Road, Hamlyn Terrace"},
+    {"lat": -33.25197, "lon": 151.48938, "casualty": "Minor/Other Injured", "road": "B70, Woongarrah"},
+    {"lat": -33.25270, "lon": 151.48874, "casualty": "Seriously Injured", "road": "Pacific Highway, Hamlyn Terrace"},  # 2 events
+    {"lat": -33.25491, "lon": 151.50318, "casualty": "Moderately Injured", "road": "Wallarah Road, Gorokan"},
+    {"lat": -33.25937, "lon": 151.51475, "casualty": "Moderately Injured", "road": "Wallarah Road, Gorokan"},
+    {"lat": -33.25446, "lon": 151.49678, "casualty": "Moderately Injured", "road": "B70, Kanwal"},  # 2 events
+    {"lat": -33.25593, "lon": 151.47480, "casualty": "Moderately Injured", "road": "Louisiana Road, Hamlyn Terrace"},
+    {"lat": -33.25557, "lon": 151.48014, "casualty": "Moderately Injured", "road": "Primrose Drive, Hamlyn Terrace"},
+    {"lat": -33.25701, "lon": 151.48149, "casualty": "Seriously Injured", "road": "Gladioli Avenue, Hamlyn Terrace"},
+    {"lat": -33.26323, "lon": 151.47328, "casualty": "Moderately Injured", "road": "Louisiana Road, Hamlyn Terrace"},  # 2 events
+    {"lat": -33.26418, "lon": 151.47310, "casualty": "Seriously Injured", "road": "Pacific Highway, Kanwal"},  # 3 events
+    {"lat": -33.26194, "lon": 151.48259, "casualty": "Minor/Other Injured", "road": "Pacific Highway, Kanwal"},
+    {"lat": -33.25394, "lon": 151.49344, "casualty": "Moderately Injured", "road": "Walker Avenue, Kanwal"},
+    {"lat": -33.25868, "lon": 151.48842, "casualty": "Moderately Injured", "road": "Walker Avenue, Kanwal"},
+    {"lat": -33.25742, "lon": 151.49575, "casualty": "Seriously Injured", "road": "Minnamurra Road, Gorokan"},
+    {"lat": -33.26217, "lon": 151.49601, "casualty": "Seriously Injured", "road": "Marks Road, Gorokan"},
+    {"lat": -33.27102, "lon": 151.45311, "casualty": "Moderately Injured", "road": "83, Wyong"},
+    {"lat": -33.27227, "lon": 151.46101, "casualty": "Moderately Injured", "road": "Johns Road, Wadalba"},
+    {"lat": -33.26625, "lon": 151.49000, "casualty": "Moderately Injured", "road": "Stanley Street, Wyongah"},
+    {"lat": -33.26829, "lon": 151.55496, "casualty": "Seriously Injured", "road": "Main Road, Noraville"},
+    {"lat": -33.26887, "lon": 151.55896, "casualty": "Moderately Injured", "road": "Main Road, Noraville"},
+    {"lat": -33.26906, "lon": 151.56032, "casualty": "Moderately Injured", "road": "A49, Noraville"},
+    {"lat": -33.26860, "lon": 151.56039, "casualty": "Minor/Other Injured", "road": "Budgewoi Road, Noraville"},
+    {"lat": -33.27066, "lon": 151.55849, "casualty": "Seriously Injured", "road": "Brisbane Street, Noraville"},
+    {"lat": -33.27136, "lon": 151.56009, "casualty": "Moderately Injured", "road": "Wilfred Barrett Drive, Norah Head"},
+    {"lat": -33.27530, "lon": 151.55825, "casualty": "Moderately Injured", "road": "Wilfred Barrett Drive, Norah Head"},
+    {"lat": -33.27936, "lon": 151.55559, "casualty": "Seriously Injured", "road": "Wilfred Barrett Drive, Noraville"},
+    {"lat": -33.27841, "lon": 151.56436, "casualty": "Moderately Injured", "road": "Soldiers Point Drive, Norah Head"},
+    {"lat": -33.24584, "lon": 151.39899, "casualty": "Seriously Injured", "road": "Hue Hue Road, Jilliby"},
+    {"lat": -33.22685, "lon": 151.41524, "casualty": "Moderately Injured", "road": "Hue Hue Road, Jilliby"},
+    {"lat": -33.22542, "lon": 151.41702, "casualty": "Seriously Injured", "road": "Sparks Road, Jilliby"},  # 3 events
+    # ── Halloran area ────────────────────────────────
+    {"lat": -33.22586, "lon": 151.42537, "casualty": "Moderately Injured", "road": "Pacific Motorway, Jilliby"},
+    {"lat": -33.23065, "lon": 151.42060, "casualty": "Moderately Injured", "road": "Pacific Motorway, Jilliby"},
+    {"lat": -33.23007, "lon": 151.42460, "casualty": "Seriously Injured", "road": "Sparks Road, Warnervale"},
+    {"lat": -33.22910, "lon": 151.42296, "casualty": "Moderately Injured", "road": "Sparks Road, Warnervale"},
+    {"lat": -33.23114, "lon": 151.42665, "casualty": "Seriously Injured", "road": "Sparks Road, Warnervale"},  # 3 events
+    {"lat": -33.24011, "lon": 151.38083, "casualty": "Seriously Injured", "road": "Jilliby Road, Jilliby"},
+    # ── Pacific Motorway (M1) area ───────────────────
+    {"lat": -33.20752, "lon": 151.43148, "casualty": "Seriously Injured", "road": "Hue Hue Road, Jilliby"},
+    {"lat": -33.21070, "lon": 151.43009, "casualty": "Moderately Injured", "road": "Hue Hue Road, Kiar"},
+    {"lat": -33.21477, "lon": 151.42788, "casualty": "Moderately Injured", "road": "Hue Hue Road, Jilliby"},
+    # ── Colongra / Scenic Drive ──────────────────────
+    {"lat": -33.18973, "lon": 151.52895, "casualty": "Moderately Injured", "road": "Pacific Highway, Doyalson North"},  # 2 events
+    {"lat": -33.19091, "lon": 151.52783, "casualty": "Seriously Injured", "road": "Pacific Highway, Doyalson"},
+    {"lat": -33.19161, "lon": 151.52761, "casualty": "Moderately Injured", "road": "Pacific Highway, Doyalson"},  # 2 events
+    {"lat": -33.19944, "lon": 151.52267, "casualty": "Moderately Injured", "road": "Scenic Drive, Doyalson"},  # 2 events
+    # ── Blue Haven / San Remo ────────────────────────
+    {"lat": -33.20578, "lon": 151.51639, "casualty": "Minor/Other Injured", "road": "Pacific Highway, Blue Haven"},
+    {"lat": -33.20717, "lon": 151.49905, "casualty": "Seriously Injured", "road": "Blue Haven Way, Blue Haven"},  # 3 events
+    {"lat": -33.20739, "lon": 151.49976, "casualty": "Moderately Injured", "road": "Roper Road, Blue Haven"},
+    {"lat": -33.21374, "lon": 151.51219, "casualty": "Seriously Injured", "road": "Pacific Highway, San Remo"},  # 3 events
+    {"lat": -33.21543, "lon": 151.50991, "casualty": "Moderately Injured", "road": "Pacific Highway, Blue Haven"},
+    {"lat": -33.21545, "lon": 151.51385, "casualty": "Minor/Other Injured", "road": "Brava Avenue, San Remo"},
+    {"lat": -33.21552, "lon": 151.52057, "casualty": "Moderately Injured", "road": "Goorama Avenue, San Remo"},
+    {"lat": -33.21804, "lon": 151.51876, "casualty": "Moderately Injured", "road": "Liamena Avenue, San Remo"},
+    {"lat": -33.21982, "lon": 151.51537, "casualty": "Seriously Injured", "road": "Emu Drive, San Remo"},
+    {"lat": -33.21258, "lon": 151.52530, "casualty": "Seriously Injured", "road": "Eyre Crescent, San Remo"},
+    # ── Budgewoi / Toukley / Noraville ───────────────
+    {"lat": -33.22219, "lon": 151.53584, "casualty": "Seriously Injured", "road": "Scenic Drive, Buff Point"},
+    {"lat": -33.21860, "lon": 151.53535, "casualty": "Seriously Injured", "road": "Scenic Drive, Colongra"},
+    {"lat": -33.23230, "lon": 151.53026, "casualty": "Seriously Injured", "road": "Buff Point Avenue, Buff Point"},
+    {"lat": -33.22910, "lon": 151.54206, "casualty": "Seriously Injured", "road": "Scenic Drive, Budgewoi"},
+    {"lat": -33.23237, "lon": 151.54799, "casualty": "Moderately Injured", "road": "Scenic Drive, Budgewoi"},
+    {"lat": -33.24874, "lon": 151.45826, "casualty": "Moderately Injured", "road": "Warnervale Road, Warnervale"},
+    {"lat": -33.24856, "lon": 151.47723, "casualty": "Moderately Injured", "road": "Monarch Drive, Hamlyn Terrace"},
+    {"lat": -33.24985, "lon": 151.48291, "casualty": "Minor/Other Injured", "road": "Sparks Road, Hamlyn Terrace"},
+    {"lat": -33.24422, "lon": 151.47212, "casualty": "Seriously Injured", "road": "Hiawatha Road, Hamlyn Terrace"},
+    {"lat": -33.24229, "lon": 151.49649, "casualty": "Moderately Injured", "road": "Pacific Highway, Charmhaven"},
+    {"lat": -33.23872, "lon": 151.49932, "casualty": "Moderately Injured", "road": "83, Lake Haven"},  # 3 events
+    {"lat": -33.23997, "lon": 151.50180, "casualty": "Minor/Other Injured", "road": "Lake Haven Drive, Lake Haven"},
+    {"lat": -33.24474, "lon": 151.49738, "casualty": "Moderately Injured", "road": "Keswick Drive, Lake Haven"},
+    {"lat": -33.24676, "lon": 151.49785, "casualty": "Moderately Injured", "road": "Gorokan Drive, Lake Haven"},
+    {"lat": -33.24898, "lon": 151.50113, "casualty": "Moderately Injured", "road": "Gorokan Drive, Lake Haven"},
+    {"lat": -33.24662, "lon": 151.50561, "casualty": "Moderately Injured", "road": "Gorokan Drive, Lake Haven"},
+    {"lat": -33.22155, "lon": 151.50503, "casualty": "Moderately Injured", "road": "Pacific Highway, Charmhaven"},  # 2 events
+    {"lat": -33.23005, "lon": 151.50295, "casualty": "Moderately Injured", "road": "Pacific Highway, Charmhaven"},  # 2 events
+    {"lat": -33.23469, "lon": 151.50195, "casualty": "Killed", "road": "Pacific Highway, Charmhaven"},  # 2 events
+    {"lat": -33.23524, "lon": 151.50168, "casualty": "Seriously Injured", "road": "Pacific Highway, Charmhaven"},
+    {"lat": -33.23382, "lon": 151.55369, "casualty": "Moderately Injured", "road": "A49, Budgewoi"},  # 2 events
+    {"lat": -33.23470, "lon": 151.55613, "casualty": "Seriously Injured", "road": "Scenic Drive, Budgewoi"},  # 2 events
+    {"lat": -33.23994, "lon": 151.56541, "casualty": "Moderately Injured", "road": "A49, Budgewoi"},
+    {"lat": -33.23487, "lon": 151.56819, "casualty": "Seriously Injured", "road": "Mimosa Road, Budgewoi"},
+]
+
+CASUALTY_DAILY_RATES = {
+    "Killed":             0.05,
+    "Seriously Injured":  0.20,
+    "Moderately Injured": 0.35,
+    "Minor/Other Injured":0.50,
+}
+
 
 def parse_field(desc, field):
     match = re.search(rf"{re.escape(field)}: ([^<]+)", str(desc))
@@ -193,7 +330,8 @@ def midpoint(coords):
     return coords[len(coords) // 2]
 
 
-def simulate_leg_conditions(row, leg_distance_m, arrival_hour, stop_order):
+def simulate_leg_conditions(row, leg_distance_m, leg_time_s, arrival_hour, stop_order):
+    """leg_time_s: OSM-speed-based travel time in seconds (from time_matrix)."""
     triggers = []
     factor = 1.0
 
@@ -217,7 +355,8 @@ def simulate_leg_conditions(row, leg_distance_m, arrival_hour, stop_order):
         triggers.append("incident nearby")
         factor += 0.22
 
-    base_minutes = travel_minutes(leg_distance_m)
+    # Base time from OSM speed data (road-type-aware), not a blanket 40 km/h assumption
+    base_minutes = leg_time_s / 60
     live_minutes = base_minutes * factor
     delay_minutes = live_minutes - base_minutes
 
@@ -248,14 +387,48 @@ def simulate_leg_conditions(row, leg_distance_m, arrival_hour, stop_order):
     }
 
 
-def build_data_input_panel(defect_locations_html, alert_rows_html, defect_selector_html):
+def build_data_input_panel(defect_locations_html, alert_rows_html, defect_selector_html, departure_time_str, incident_total):
     sample_path = html.escape(DATASET_PATH)
     return f"""
 <div class="planner-panel planner-sidebar">
   <div class="panel-header">
     <div>
       <div class="panel-title">Defect Input And Route Context</div>
-      <div class="panel-subtitle">Manual input, dataset source, precise defect locations, alerts, and legend.</div>
+      <div class="panel-subtitle">Departure time, manual input, dataset source, precise defect locations, alerts, and legend.</div>
+    </div>
+    <button class="toggle-btn" onclick="togglePanel(this)" title="Collapse / expand">▾</button>
+  </div>
+  <div class="panel-body">
+
+  <div class="planner-section" style="padding-top:0;border-top:none;">
+    <div class="section-title">Departure Time</div>
+    <div class="helper-text">Set the crew departure time. Traffic simulation and incident congestion update automatically.</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+      <input id="departure-time-input" type="time" value="{departure_time_str}"
+             class="planner-input" style="width:120px;font-size:16px;font-weight:700;padding:8px 10px;">
+      <div style="font-size:12px;color:var(--text-soft);">
+        <span id="incident-active-count" style="font-weight:700;color:#d32f2f;">0</span>
+        of <span id="incident-total-count">{incident_total}</span> historical hotspots active today
+      </div>
+    </div>
+  </div>
+
+  <div class="planner-section">
+    <div class="section-title">Today's Active Incidents</div>
+    <div class="helper-text">
+      Hotspot data covers all of 2024 ({incident_total} recorded locations).
+      Set how many are treated as active today — higher-severity sites are selected first.
+      Active incidents create congestion zones that increase travel time on nearby legs.
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+      <input id="incident-count-slider" type="range" min="0" max="{incident_total}" value="2"
+             style="flex:1;accent-color:#d32f2f;">
+      <strong id="incident-count-value" style="min-width:24px;color:#d32f2f;">2</strong>
+      <button class="planner-btn planner-btn-secondary" style="padding:5px 12px;"
+              onclick="rerandomizeIncidents()">Shuffle</button>
+    </div>
+    <div class="helper-text" style="margin-top:6px;" id="incident-impact-text">
+      Drag slider then click Shuffle to activate a random subset weighted by casualty severity.
     </div>
   </div>
 
@@ -346,11 +519,17 @@ def build_data_input_panel(defect_locations_html, alert_rows_html, defect_select
       <div><span class="legend-dot" style="background:#ef6c00;"></span>High-impact connector repair</div>
       <div><span class="legend-dot" style="background:#1565c0;"></span>Planned connector repair</div>
       <div><span class="legend-dot" style="background:#546e7a;"></span>Routine local street repair</div>
-      <div><span class="legend-line" style="background:#2a9d8f;"></span>Light simulated traffic</div>
-      <div><span class="legend-line" style="background:#f4a261;"></span>Moderate simulated traffic</div>
-      <div><span class="legend-line" style="background:#d62828;"></span>Heavy simulated traffic</div>
+      <div><span class="legend-line" style="background:#2a9d8f;"></span>Light traffic</div>
+      <div><span class="legend-line" style="background:#f4a261;"></span>Moderate traffic</div>
+      <div><span class="legend-line" style="background:#d62828;"></span>Heavy traffic</div>
       <div><span class="legend-home">⌂</span>Depot</div>
+      <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text-soft);">Historical crash casualties</div>
+      <div><span class="casualty-legend-dot" style="background:#e53935;"></span>Killed</div>
+      <div><span class="casualty-legend-dot" style="background:#fb8c00;"></span>Seriously Injured</div>
+      <div><span class="casualty-legend-dot" style="background:#37474f;"></span>Moderately Injured</div>
+      <div><span class="casualty-legend-dot" style="background:#00acc1;"></span>Minor / Other Injured</div>
     </div>
+  </div>
   </div>
 </div>
 """
@@ -379,6 +558,9 @@ print("Loading road network...")
 G = ox.load_graphml(ROAD_GRAPH_PATH)
 G = G.subgraph(max(nx.strongly_connected_components(G), key=len)).copy()
 print(f"  Nodes: {G.number_of_nodes()}, Edges: {G.number_of_edges()}")
+print("Adding speed and travel-time attributes to edges...")
+G = ox.add_edge_speeds(G)        # assigns speed (km/h) per highway type / maxspeed tag
+G = ox.add_edge_travel_times(G)  # travel_time (s) = length / speed for each edge
 
 print("Attaching road context from local graph only...")
 nearest_edges = ox.nearest_edges(G, pts["lon"].tolist(), pts["lat"].tolist(), return_dist=False)
@@ -405,19 +587,24 @@ all_lons = [DEPOT_LON] + pts["lon"].tolist()
 all_nodes = ox.nearest_nodes(G, all_lons, all_lats)
 n_nodes = len(all_nodes)
 
-print(f"Building {n_nodes}x{n_nodes} road distance matrix...")
-dist_matrix = np.full((n_nodes, n_nodes), np.inf)
+print(f"Building {n_nodes}x{n_nodes} road distance and travel-time matrices...")
+dist_matrix = np.full((n_nodes, n_nodes), np.inf)   # metres  – for fuel / distance reporting
+time_matrix = np.full((n_nodes, n_nodes), np.inf)   # seconds – for routing decisions
 np.fill_diagonal(dist_matrix, 0)
+np.fill_diagonal(time_matrix, 0)
 for i, source_node in enumerate(all_nodes):
-    lengths = nx.single_source_dijkstra_path_length(G, source_node, weight="length")
+    dist_lengths = nx.single_source_dijkstra_path_length(G, source_node, weight="length")
+    time_lengths = nx.single_source_dijkstra_path_length(G, source_node, weight="travel_time")
     for j, target_node in enumerate(all_nodes):
-        if target_node in lengths:
-            dist_matrix[i][j] = lengths[target_node]
-print("Distance matrix complete.")
+        if target_node in dist_lengths:
+            dist_matrix[i][j] = dist_lengths[target_node]
+        if target_node in time_lengths:
+            time_matrix[i][j] = time_lengths[target_node]
+print("Distance and travel-time matrices complete.")
 
-depot_leg_distances = pd.Series(dist_matrix[0][1:], index=pts.index).replace(np.inf, np.nan)
-max_depot_leg = max(depot_leg_distances.max(skipna=True), 1)
-pts["route_efficiency_score"] = (1 - (depot_leg_distances / max_depot_leg)).fillna(0)
+depot_leg_times = pd.Series(time_matrix[0][1:], index=pts.index).replace(np.inf, np.nan)
+max_depot_leg_time = max(depot_leg_times.max(skipna=True), 1)
+pts["route_efficiency_score"] = (1 - (depot_leg_times / max_depot_leg_time)).fillna(0)
 pts["ranking_score"] = (
     pts["severity_score"] * RANKING_WEIGHTS["Defect severity"]
     + pts["road_importance_score"] * RANKING_WEIGHTS["Road importance"]
@@ -457,8 +644,10 @@ for band_rank in sorted(pts["band_rank"].unique()):
         best = min(
             unvisited,
             key=lambda idx: (
-                dist_matrix[current][idx + 1] - pts.loc[idx, "ranking_score"] * 250,
-                dist_matrix[current][idx + 1],
+                # Use travel-time (s) instead of raw distance.
+                # ranking_score bonus: 1.0 score ≈ worth 60 s detour (≈ 250 m at 15 km/h local speed)
+                time_matrix[current][idx + 1] - pts.loc[idx, "ranking_score"] * 60,
+                time_matrix[current][idx + 1],
             ),
         )
         route_idx.append(best)
@@ -475,8 +664,9 @@ total_fuel_cost_aud = 0.0
 for leg_number, pts_i in enumerate(route_idx, start=1):
     row = pts.loc[pts_i]
     leg_distance_m = dist_matrix[node_seq[leg_number - 1]][node_seq[leg_number]]
+    leg_time_s = time_matrix[node_seq[leg_number - 1]][node_seq[leg_number]]
     arrival_hour = SIMULATION_START_HOUR + cumulative_time_min / 60
-    traffic = simulate_leg_conditions(row, leg_distance_m, arrival_hour, leg_number)
+    traffic = simulate_leg_conditions(row, leg_distance_m, leg_time_s, arrival_hour, leg_number)
     cumulative_dist_m += leg_distance_m
     cumulative_time_min += traffic["simulated_travel_min"] + row["service_time_min"]
     simulated_total_travel_min += traffic["simulated_travel_min"]
@@ -657,6 +847,16 @@ folium.Marker(
     tooltip="Depot",
     icon=folium.Icon(color="black", icon="home", prefix="fa"),
 ).add_to(m)
+
+# ── Incident hotspot data for JS rendering ────────────────────────────────────
+expected_daily_incidents = sum(
+    CASUALTY_DAILY_RATES.get(h["casualty"], 0.35)
+    for h in ACCIDENT_HOTSPOTS
+)
+accident_hotspots_json = json.dumps(ACCIDENT_HOTSPOTS)
+_dh = int(SIMULATION_START_HOUR)
+_dm = int((SIMULATION_START_HOUR - _dh) * 60)
+departure_time_str = f"{_dh:02d}:{_dm:02d}"
 
 weight_rows_html = "".join(
     f"<tr><td>{html.escape(name)}</td><td style='text-align:right;'>{weight * 100:.0f}%</td></tr>"
@@ -1017,24 +1217,70 @@ legend_html = f"""
     .planner-card-top {{ width: 320px; }}
     .planner-card-bottom {{ width: 420px; }}
   }}
+  .toggle-btn {{
+    background: none;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+  }}
+  .toggle-btn:hover {{ background: var(--accent-soft); color: var(--accent); }}
+  .panel-body {{
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.25s ease;
+    max-height: 3000px;
+    opacity: 1;
+  }}
+  .panel-body.collapsed {{
+    max-height: 0 !important;
+    opacity: 0;
+  }}
+  .casualty-legend-dot {{
+    width: 11px; height: 11px; border-radius: 50%;
+    display: inline-block; flex: 0 0 11px;
+    border: 1px solid rgba(0,0,0,0.18);
+  }}
 </style>
-{build_data_input_panel(defect_locations_html, alert_rows_html, defect_selector_html)}
+{build_data_input_panel(defect_locations_html, alert_rows_html, defect_selector_html, departure_time_str, len(ACCIDENT_HOTSPOTS))}
 <div class="planner-panel planner-card-top">
-  <div class="panel-title">Decision Factors And Weights</div>
-  <div class="panel-subtitle">The system shall display decision factors, weights, and transparent prioritisation logic.</div>
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">Decision Factors And Weights</div>
+      <div class="panel-subtitle">Prioritisation logic and crash hotspot summary.</div>
+    </div>
+    <button class="toggle-btn" onclick="togglePanel(this)" title="Collapse / expand">▾</button>
+  </div>
+  <div class="panel-body">
   <table class="metric-table">
     <tr><th align="left">Factor</th><th align="right">Weight</th></tr>
     {weight_rows_html}
   </table>
   <div class="helper-text" style="margin-top:10px;">
-    Start time: {hour_to_label(SIMULATION_START_HOUR)}<br>
-    Fuel assumption: {FUEL_EFFICIENCY_L_PER_100KM:.1f} L/100 km at AUD {FUEL_PRICE_AUD_PER_L:.2f}/L<br>
+    Main route computed at: {hour_to_label(SIMULATION_START_HOUR)} — adjust departure in left panel.<br>
+    Fuel: {FUEL_EFFICIENCY_L_PER_100KM:.1f} L/100 km @ AUD {FUEL_PRICE_AUD_PER_L:.2f}/L<br>
+    Historical crash hotspots: <b>{len(ACCIDENT_HOTSPOTS)}</b> locations in area<br>
+    Est. daily casualty events: <b>{expected_daily_incidents:.0f}</b><br>
     Map only shows defects included in the final route.
+  </div>
   </div>
 </div>
 <div class="planner-panel planner-card-bottom">
-  <div class="panel-title">Route Dashboard</div>
-  <div class="panel-subtitle">Each row shows segment time, distance, cost, and justification in an interpretable format.</div>
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">Route Dashboard</div>
+      <div class="panel-subtitle">Per-segment time, distance, cost, and justification.</div>
+    </div>
+    <button class="toggle-btn" onclick="togglePanel(this)" title="Collapse / expand">▾</button>
+  </div>
+  <div class="panel-body">
   <table class="dashboard-table">
     <tr>
       <th align="left">Stop</th>
@@ -1046,13 +1292,26 @@ legend_html = f"""
     </tr>
     {''.join(segment_rows_html)}
   </table>
+  </div>
 </div>
 <script>
   const existingDefects = {interactive_route_json};
   const depotPoint = {depot_json};
   const roadPathLookup = {interactive_path_lookup_json};
+  const accidentHotspots = {accident_hotspots_json};
   let customRouteLayer = null;
+  let incidentLayer = null;
+  let activeIncidents = [];   // subset of accidentHotspots active today
 
+  // Severity weights: higher = more likely to be selected as "active"
+  const CASUALTY_SEVERITY_WEIGHT = {{
+    'Killed':             4,
+    'Seriously Injured':  3,
+    'Moderately Injured': 2,
+    'Minor/Other Injured':1,
+  }};
+
+  // ── Map accessor ─────────────────────────────────────────────────────────────
   function getLeafletMap() {{
     for (const value of Object.values(window)) {{
       if (value && typeof value.eachLayer === 'function' && typeof value.setView === 'function') {{
@@ -1062,14 +1321,54 @@ legend_html = f"""
     return null;
   }}
 
+  // ── Time helpers ─────────────────────────────────────────────────────────────
+  function getDepartureHour() {{
+    const input = document.getElementById('departure-time-input');
+    if (!input || !input.value) return {SIMULATION_START_HOUR};
+    const parts = input.value.split(':').map(Number);
+    return parts[0] + parts[1] / 60;
+  }}
+
+  function hourToLabel(h) {{
+    const totalMin = Math.round(((h % 24) + 24) % 24 * 60);
+    const hh = String(Math.floor(totalMin / 60)).padStart(2, '0');
+    const mm = String(totalMin % 60).padStart(2, '0');
+    return hh + ':' + mm;
+  }}
+
+  function hourInPeak(h, ...bounds) {{
+    if (bounds.length === 2) return h >= bounds[0] && h <= bounds[1];
+    return (h >= bounds[0] && h <= bounds[1]) || (h >= bounds[2] && h <= bounds[3]);
+  }}
+
+  // ── Traffic delay factor at a given hour ─────────────────────────────────────
+  function trafficFactor(arrivalHour) {{
+    let f = 1.0;
+    if (hourInPeak(arrivalHour, 7.0, 9.0, 14.5, 16.5)) f += 0.18;   // school peak
+    if (hourInPeak(arrivalHour, 7.0, 9.5, 16.0, 18.5)) f += 0.12;   // work peak
+    if (hourInPeak(arrivalHour, 9.0, 15.0))             f += 0.10;   // freight peak
+    return f;
+  }}
+
+  function trafficLabel(factor) {{
+    if (factor >= 1.38) return 'Heavy';
+    if (factor >= 1.15) return 'Moderate';
+    return 'Light';
+  }}
+
+  function trafficColor(factor) {{
+    if (factor >= 1.38) return '#d62828';
+    if (factor >= 1.15) return '#f4a261';
+    return '#2a9d8f';
+  }}
+
+  // ── Distance helpers ─────────────────────────────────────────────────────────
   function haversineKm(a, b) {{
-    const toRad = (deg) => deg * Math.PI / 180;
+    const toRad = (d) => d * Math.PI / 180;
     const R = 6371;
     const dLat = toRad(b.lat - a.lat);
     const dLon = toRad(b.lon - a.lon);
-    const lat1 = toRad(a.lat);
-    const lat2 = toRad(b.lat);
-    const x = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    const x = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon / 2) ** 2;
     return 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
   }}
 
@@ -1086,32 +1385,151 @@ legend_html = f"""
   }}
 
   function getRoadPath(fromKey, toKey) {{
-    return roadPathLookup[`${{fromKey}}-${{toKey}}`] || null;
+    return roadPathLookup[fromKey + '-' + toKey] || null;
   }}
 
+  // ── Panel toggle ─────────────────────────────────────────────────────────────
+  function togglePanel(btn) {{
+    const body = btn.closest('.planner-panel').querySelector('.panel-body');
+    if (!body) return;
+    const isCollapsed = body.classList.toggle('collapsed');
+    btn.textContent = isCollapsed ? '\u25b8' : '\u25be';
+    btn.title = isCollapsed ? 'Expand' : 'Collapse';
+  }}
+
+  // ── Active incident management ────────────────────────────────────────────────
+
+  // Weighted random selection of n hotspots (higher severity = more likely)
+  function activateIncidentsRandom(n) {{
+    if (n <= 0)  {{ activeIncidents = []; return; }}
+    if (n >= accidentHotspots.length) {{ activeIncidents = [...accidentHotspots]; return; }}
+
+    // Build cumulative weight table
+    const weights = accidentHotspots.map(h => CASUALTY_SEVERITY_WEIGHT[h.casualty] || 1);
+    const totalW  = weights.reduce((s, w) => s + w, 0);
+
+    const selected = new Set();
+    let attempts = 0;
+    while (selected.size < n && attempts < n * 20) {{
+      attempts++;
+      let r = Math.random() * totalW;
+      for (let i = 0; i < accidentHotspots.length; i++) {{
+        r -= weights[i];
+        if (r <= 0) {{ selected.add(i); break; }}
+      }}
+    }}
+    activeIncidents = Array.from(selected).map(i => accidentHotspots[i]);
+  }}
+
+  // Congestion factor for a route leg based on proximity to active incidents
+  // pathCoords: [[lat,lon], ...] — checks sampled points along the whole path
+  function incidentCongestionForPath(pathCoords) {{
+    if (!activeIncidents.length) return 1.0;
+    const coords = pathCoords || [];
+    // Sample up to 12 evenly spaced points along the path
+    const step = Math.max(1, Math.floor(coords.length / 12));
+    let maxFactor = 1.0;
+    for (const inc of activeIncidents) {{
+      const incPt = {{ lat: inc.lat, lon: inc.lon }};
+      for (let i = 0; i < coords.length; i += step) {{
+        const km = haversineKm({{ lat: coords[i][0], lon: coords[i][1] }}, incPt);
+        let f = 1.0;
+        if      (km < 0.30) f = 1.40;   // <300 m : heavy congestion
+        else if (km < 0.70) f = 1.22;   // <700 m : moderate
+        else if (km < 1.50) f = 1.09;   // <1.5 km: light spillback
+        if (f > maxFactor) maxFactor = f;
+        if (maxFactor >= 1.40) break;
+      }}
+      if (maxFactor >= 1.40) break;
+    }}
+    return maxFactor;
+  }}
+
+  // Slider + shuffle handler
+  function rerandomizeIncidents() {{
+    const n = Number(document.getElementById('incident-count-slider').value);
+    activateIncidentsRandom(n);
+    // Update counter label
+    const countEl = document.getElementById('incident-active-count');
+    if (countEl) countEl.textContent = activeIncidents.length;
+    // Update impact text
+    const el = document.getElementById('incident-impact-text');
+    if (el) {{
+      if (!activeIncidents.length) {{
+        el.textContent = 'No active incidents — route uses time-of-day traffic only.';
+      }} else {{
+        const roads = [...new Set(activeIncidents.map(h => h.road.split(',')[0]))].slice(0, 3).join(', ');
+        el.textContent = activeIncidents.length + ' active incident(s) near: ' + roads +
+                         '. Nearby route legs show increased travel time.';
+      }}
+    }}
+    renderIncidentLayer();
+    generateCustomRoute();
+  }}
+
+  // ── Crash casualty hotspot rendering ─────────────────────────────────────────
+  const CASUALTY_COLORS = {{
+    'Killed':             '#e53935',
+    'Seriously Injured':  '#fb8c00',
+    'Moderately Injured': '#37474f',
+    'Minor/Other Injured':'#00acc1',
+  }};
+
+  function renderIncidentLayer() {{
+    const map = getLeafletMap();
+    if (!map) return;
+    if (incidentLayer) {{ incidentLayer.remove(); }}
+    incidentLayer = L.layerGroup().addTo(map);
+    const activeSet = new Set(activeIncidents.map(h => h.lat + ',' + h.lon));
+
+    accidentHotspots.forEach((h) => {{
+      const isActive = activeSet.has(h.lat + ',' + h.lon);
+      const color  = CASUALTY_COLORS[h.casualty] || '#888';
+      const radius = isActive ? 14 : 8;
+      const opacity = isActive ? 1.0 : 0.25;
+      const ring = isActive
+        ? 'box-shadow:0 0 0 4px ' + color + '66,0 0 12px ' + color + '99,0 2px 6px rgba(0,0,0,.4);'
+        : 'box-shadow:0 1px 3px rgba(0,0,0,.15);';
+
+      const marker = L.marker([h.lat, h.lon], {{
+        icon: L.divIcon({{
+          className: '',
+          html: '<div style="width:' + radius + 'px;height:' + radius + 'px;border-radius:50%;' +
+                'background:' + color + ';opacity:' + opacity + ';' + ring + '"></div>',
+          iconSize: [radius, radius],
+          iconAnchor: [radius / 2, radius / 2],
+        }})
+      }});
+
+      const statusNote = isActive
+        ? '<span style="color:#d32f2f;font-weight:700;">\u26a0 ACTIVE TODAY — congestion zone active</span>'
+        : '<span style="color:#888;">Historical record only (not active today)</span>';
+      marker.bindPopup('<b>' + h.casualty + '</b><br>' + h.road + '<br>' + statusNote);
+      marker.addTo(incidentLayer);
+    }});
+
+    const countEl = document.getElementById('incident-active-count');
+    if (countEl) countEl.textContent = activeIncidents.length;
+  }}
+
+  // ── Weights & scoring ─────────────────────────────────────────────────────────
   function getWeights() {{
-    const weights = {{
-      severity: Number(document.getElementById('weight-severity').value),
-      road: Number(document.getElementById('weight-road').value),
-      urgency: Number(document.getElementById('weight-urgency').value),
-      traffic: Number(document.getElementById('weight-traffic').value),
+    const raw = {{
+      severity:   Number(document.getElementById('weight-severity').value),
+      road:       Number(document.getElementById('weight-road').value),
+      urgency:    Number(document.getElementById('weight-urgency').value),
+      traffic:    Number(document.getElementById('weight-traffic').value),
       efficiency: Number(document.getElementById('weight-efficiency').value),
     }};
-    const total = Object.values(weights).reduce((sum, value) => sum + value, 0) || 1;
-    return {{
-      severity: weights.severity / total,
-      road: weights.road / total,
-      urgency: weights.urgency / total,
-      traffic: weights.traffic / total,
-      efficiency: weights.efficiency / total,
-    }};
+    const total = Object.values(raw).reduce((s, v) => s + v, 0) || 1;
+    return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, v / total]));
   }}
 
   function computePriorityScore(defect, weights) {{
     return (
-      defect.severity_score * weights.severity +
+      defect.severity_score        * weights.severity +
       defect.road_importance_score * weights.road +
-      defect.urgency_score * weights.urgency +
+      defect.urgency_score         * weights.urgency +
       defect.traffic_exposure_score * weights.traffic +
       defect.route_efficiency_score * weights.efficiency
     );
@@ -1119,91 +1537,104 @@ legend_html = f"""
 
   function getSelectedDefects() {{
     const selectedIds = Array.from(document.querySelectorAll('.existing-defect-checkbox:checked'))
-      .map((checkbox) => Number(checkbox.value));
-    return existingDefects.filter((defect) => selectedIds.includes(defect.id));
+      .map((cb) => Number(cb.value));
+    return existingDefects.filter((d) => selectedIds.includes(d.id));
   }}
 
+  // ── Route building with departure-time-aware traffic simulation ───────────────
   function buildWeightedRoute(selectedDefects, weights) {{
-    const remaining = selectedDefects.map((defect) => ({{
-      ...defect,
-      priorityScore: computePriorityScore(defect, weights),
-    }}));
+    const departureHour = getDepartureHour();
+    const remaining = selectedDefects.map((d) => ({{ ...d, priorityScore: computePriorityScore(d, weights) }}));
     const route = [];
     let current = depotPoint;
     let currentKey = 'depot';
     let totalKm = 0;
+    let cumulativeMin = 0;
 
     while (remaining.length) {{
       remaining.sort((a, b) => b.priorityScore - a.priorityScore);
-      let bestIndex = 0;
-      let bestValue = Infinity;
+      let bestIndex = 0, bestValue = Infinity;
       remaining.forEach((defect, index) => {{
-        const candidatePath = getRoadPath(currentKey, defect.id);
-        const km = candidatePath ? pathDistanceKm(candidatePath) : haversineKm(current, defect);
-        const value = km - defect.priorityScore * 8;
-        if (value < bestValue) {{
-          bestValue = value;
-          bestIndex = index;
-        }}
+        const path = getRoadPath(currentKey, defect.id);
+        const km = path ? pathDistanceKm(path) : haversineKm(current, defect);
+        const val = km - defect.priorityScore * 8;
+        if (val < bestValue) {{ bestValue = val; bestIndex = index; }}
       }});
+
       const next = remaining.splice(bestIndex, 1)[0];
       next.pathCoords = getRoadPath(currentKey, next.id) || [[current.lat, current.lon], [next.lat, next.lon]];
       next.legKm = pathDistanceKm(next.pathCoords);
+
+      const arrivalHour = departureHour + cumulativeMin / 60;
+      const tf  = trafficFactor(arrivalHour);
+      const inc = incidentCongestionForPath(next.pathCoords);
+      // Combine time-of-day traffic with incident congestion (multiplicative, capped at 2×)
+      const combinedFactor = Math.min(tf * inc, 2.0);
+      const baseDriveMin = next.legKm / 40 * 60;
+      next.driveMin = baseDriveMin * combinedFactor;
+      next.trafficFactor = combinedFactor;
+      next.incidentDelay = inc > 1.0;
+      next.trafficLabel = trafficLabel(combinedFactor);
+      next.arrivalTime = hourToLabel(arrivalHour);
+      cumulativeMin += next.driveMin + next.service_time_min;
       totalKm += next.legKm;
       route.push(next);
       current = next;
       currentKey = next.id;
     }}
 
-    return {{ route, totalKm }};
+    const totalH = Math.floor(cumulativeMin / 60);
+    const totalM = Math.round(cumulativeMin % 60);
+    return {{ route, totalKm, totalHours: totalH, totalMins: totalM }};
   }}
 
+  // ── Map rendering ─────────────────────────────────────────────────────────────
   function renderCustomRoute(result) {{
     const map = getLeafletMap();
     if (!map) return;
-    if (customRouteLayer) {{
-      customRouteLayer.remove();
-    }}
+    if (customRouteLayer) {{ customRouteLayer.remove(); }}
     customRouteLayer = L.layerGroup().addTo(map);
 
     const latlngs = [[depotPoint.lat, depotPoint.lon]];
     result.route.forEach((defect, index) => {{
-      if (defect.pathCoords && defect.pathCoords.length) {{
-        defect.pathCoords.forEach((coord, coordIndex) => {{
-          if (index === 0 && coordIndex === 0) return;
-          latlngs.push(coord);
-        }});
-      }} else {{
-        latlngs.push([defect.lat, defect.lon]);
-      }}
+      const lineColor = trafficColor(defect.trafficFactor);
+      L.polyline(
+        defect.pathCoords || [[depotPoint.lat, depotPoint.lon], [defect.lat, defect.lon]],
+        {{ color: lineColor, weight: 5, opacity: 0.88, dashArray: '10 8' }}
+      ).addTo(customRouteLayer);
+
+      if (defect.pathCoords) defect.pathCoords.forEach((c) => latlngs.push(c));
+      else latlngs.push([defect.lat, defect.lon]);
+
       const marker = L.marker([defect.lat, defect.lon], {{
         icon: L.divIcon({{
           className: '',
-          html: `<div style="width:30px;height:30px;border-radius:15px;background:#0f766e;color:white;text-align:center;line-height:30px;font-weight:700;border:2px solid white;box-shadow:0 4px 10px rgba(0,0,0,.25);">${{index + 1}}</div>`,
+          html: '<div style="width:30px;height:30px;border-radius:15px;background:' + lineColor +
+                ';color:white;text-align:center;line-height:30px;font-weight:700;' +
+                'border:2px solid white;box-shadow:0 4px 10px rgba(0,0,0,.25);">' + (index + 1) + '</div>',
           iconSize: [30, 30],
-          iconAnchor: [15, 15]
+          iconAnchor: [15, 15],
         }})
       }});
+      const delayPct = Math.round((defect.trafficFactor - 1) * 100);
+      const incNote = defect.incidentDelay
+        ? '<br><span style="color:#d32f2f;font-weight:700;">\u26a0 Incident congestion on this leg</span>'
+        : '';
       marker.bindPopup(
-        `<b>Stop ${{index + 1}}</b><br>` +
-        `${{defect.defect_number}}<br>` +
-        `${{defect.specific_location}}<br>` +
-        `Weighted score: ${{(defect.priorityScore * 100).toFixed(1)}} / 100<br>` +
-        `Travel from previous point: ${{defect.legKm.toFixed(2)}} km`
+        '<b>Stop ' + (index + 1) + '</b><br>' +
+        defect.defect_number + '<br>' +
+        defect.specific_location + '<br>' +
+        'Arrive: ~' + defect.arrivalTime + '<br>' +
+        'Drive: ' + Math.round(defect.driveMin) + ' min' +
+          (delayPct > 0 ? ' (+' + delayPct + '% ' + defect.trafficLabel + ' traffic)' : '') +
+        incNote + '<br>' +
+        'Leg distance: ' + defect.legKm.toFixed(2) + ' km<br>' +
+        'Priority score: ' + (defect.priorityScore * 100).toFixed(1) + ' / 100'
       );
       marker.addTo(customRouteLayer);
     }});
 
-    result.route.forEach((defect) => {{
-      L.polyline(defect.pathCoords || [[depotPoint.lat, depotPoint.lon], [defect.lat, defect.lon]], {{
-        color: '#0f766e',
-        weight: 5,
-        opacity: 0.9,
-        dashArray: '10 8'
-      }}).addTo(customRouteLayer);
-    }});
-
-    map.fitBounds(latlngs, {{ padding: [50, 50] }});
+    if (latlngs.length > 1) map.fitBounds(latlngs, {{ padding: [50, 50] }});
   }}
 
   function updateCustomRouteSummary(result) {{
@@ -1212,29 +1643,31 @@ legend_html = f"""
       summary.innerHTML = 'Choose at least 2 defects to generate a weighted route.';
       return;
     }}
-    const rows = result.route.map((defect, index) =>
-      `<div style="margin-top:6px;"><b>${{index + 1}}.</b> ${{defect.defect_number}} | ${{defect.legKm.toFixed(2)}} km | score ${{(defect.priorityScore * 100).toFixed(1)}} / 100</div>`
+    const depInput = document.getElementById('departure-time-input');
+    const depStr = depInput ? depInput.value : hourToLabel({SIMULATION_START_HOUR});
+    const rows = result.route.map((d, i) =>
+      '<div style="margin-top:5px;"><b>' + (i + 1) + '.</b> ' + d.defect_number +
+      ' | ' + d.legKm.toFixed(2) + ' km' +
+      ' | drive ' + Math.round(d.driveMin) + ' min' +
+      ' | arrive ~' + d.arrivalTime +
+      ' | ' + d.trafficLabel + ' traffic' +
+      ' | score ' + (d.priorityScore * 100).toFixed(1) + '/100</div>'
     ).join('');
     summary.innerHTML =
-      `<b>Generated weighted route</b><br>` +
-      `<span class="helper-text">Stops: ${{result.route.length}} | Approx distance: ${{result.totalKm.toFixed(2)}} km</span>` +
+      '<b>Route — depart ' + depStr + '</b><br>' +
+      '<span class="helper-text">Stops: ' + result.route.length +
+      ' | Distance: ' + result.totalKm.toFixed(2) + ' km' +
+      ' | Total time: ' + result.totalHours + 'h ' + result.totalMins + 'min (incl. service)</span>' +
       rows;
   }}
 
   function syncWeightLabels() {{
-    const pairs = [
-      ['weight-severity', 'weight-severity-value'],
-      ['weight-road', 'weight-road-value'],
-      ['weight-urgency', 'weight-urgency-value'],
-      ['weight-traffic', 'weight-traffic-value'],
-      ['weight-efficiency', 'weight-efficiency-value'],
-    ];
-    pairs.forEach(([inputId, labelId]) => {{
-      const input = document.getElementById(inputId);
-      const label = document.getElementById(labelId);
-      if (input && label) {{
-        label.textContent = `${{input.value}}%`;
-      }}
+    [['weight-severity','weight-severity-value'],['weight-road','weight-road-value'],
+     ['weight-urgency','weight-urgency-value'],['weight-traffic','weight-traffic-value'],
+     ['weight-efficiency','weight-efficiency-value']].forEach(([iId, lId]) => {{
+      const inp = document.getElementById(iId);
+      const lbl = document.getElementById(lId);
+      if (inp && lbl) lbl.textContent = inp.value + '%';
     }});
   }}
 
@@ -1250,26 +1683,48 @@ legend_html = f"""
     renderCustomRoute(result);
   }}
 
+  // ── Bootstrap ─────────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {{
     syncWeightLabels();
-    document.querySelectorAll('.weight-control input[type=range]').forEach((input) => {{
-      input.addEventListener('input', syncWeightLabels);
+    document.querySelectorAll('.weight-control input[type=range]').forEach((inp) => {{
+      inp.addEventListener('input', syncWeightLabels);
     }});
-    const generateButton = document.getElementById('generate-custom-route');
-    if (generateButton) {{
-      generateButton.addEventListener('click', generateCustomRoute);
-    }}
-    const selectTopButton = document.getElementById('select-top-defects');
-    if (selectTopButton) {{
-      selectTopButton.addEventListener('click', () => {{
-        const boxes = Array.from(document.querySelectorAll('.existing-defect-checkbox'));
-        boxes.forEach((box, index) => {{
-          box.checked = index < 10;
-        }});
+
+    const generateBtn = document.getElementById('generate-custom-route');
+    if (generateBtn) generateBtn.addEventListener('click', generateCustomRoute);
+
+    const selectTopBtn = document.getElementById('select-top-defects');
+    if (selectTopBtn) {{
+      selectTopBtn.addEventListener('click', () => {{
+        Array.from(document.querySelectorAll('.existing-defect-checkbox'))
+          .forEach((box, i) => {{ box.checked = i < 10; }});
         generateCustomRoute();
       }});
     }}
-    setTimeout(generateCustomRoute, 600);
+
+    const depInput = document.getElementById('departure-time-input');
+    if (depInput) {{
+      depInput.addEventListener('change', () => {{
+        renderIncidentLayer();
+        generateCustomRoute();
+      }});
+    }}
+
+    // Incident count slider — update label live, apply on release
+    const incSlider = document.getElementById('incident-count-slider');
+    if (incSlider) {{
+      incSlider.addEventListener('input', () => {{
+        document.getElementById('incident-count-value').textContent = incSlider.value;
+      }});
+      incSlider.addEventListener('change', rerandomizeIncidents);
+    }}
+
+    setTimeout(() => {{
+      // Default: activate 2 incidents on load
+      activateIncidentsRandom(2);
+      document.getElementById('incident-count-value').textContent = '2';
+      rerandomizeIncidents();
+    }}, 650);
   }});
 </script>
 """

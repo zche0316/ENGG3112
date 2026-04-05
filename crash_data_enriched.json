@@ -1,0 +1,807 @@
+[
+  {
+    "lat": -33.18973,
+    "lon": 151.52895,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Doyalson North",
+    "count": 2
+  },
+  {
+    "lat": -33.19091,
+    "lon": 151.52783,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, Doyalson",
+    "count": 1
+  },
+  {
+    "lat": -33.19161,
+    "lon": 151.52761,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Doyalson",
+    "count": 2
+  },
+  {
+    "lat": -33.19944,
+    "lon": 151.52267,
+    "casualty": "Moderately Injured",
+    "road": "Scenic Drive, Doyalson",
+    "count": 2
+  },
+  {
+    "lat": -33.20578,
+    "lon": 151.51639,
+    "casualty": "Minor/Other Injured",
+    "road": "Pacific Highway, Blue Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.20717,
+    "lon": 151.49905,
+    "casualty": "Seriously Injured",
+    "road": "Blue Haven Way, Blue Haven",
+    "count": 3
+  },
+  {
+    "lat": -33.20739,
+    "lon": 151.49976,
+    "casualty": "Moderately Injured",
+    "road": "Roper Road, Blue Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.21374,
+    "lon": 151.51219,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, San Remo",
+    "count": 3
+  },
+  {
+    "lat": -33.21543,
+    "lon": 151.50991,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Blue Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.21545,
+    "lon": 151.51385,
+    "casualty": "Minor/Other Injured",
+    "road": "Brava Avenue, San Remo",
+    "count": 1
+  },
+  {
+    "lat": -33.21552,
+    "lon": 151.52057,
+    "casualty": "Moderately Injured",
+    "road": "Goorama Avenue, San Remo",
+    "count": 1
+  },
+  {
+    "lat": -33.21804,
+    "lon": 151.51876,
+    "casualty": "Moderately Injured",
+    "road": "Liamena Avenue, San Remo",
+    "count": 1
+  },
+  {
+    "lat": -33.21982,
+    "lon": 151.51537,
+    "casualty": "Seriously Injured",
+    "road": "Emu Drive, San Remo",
+    "count": 1
+  },
+  {
+    "lat": -33.21258,
+    "lon": 151.5253,
+    "casualty": "Seriously Injured",
+    "road": "Eyre Crescent, San Remo",
+    "count": 1
+  },
+  {
+    "lat": -33.22219,
+    "lon": 151.53584,
+    "casualty": "Seriously Injured",
+    "road": "Scenic Drive, Buff Point",
+    "count": 1
+  },
+  {
+    "lat": -33.2186,
+    "lon": 151.53535,
+    "casualty": "Seriously Injured",
+    "road": "Scenic Drive, Colongra",
+    "count": 1
+  },
+  {
+    "lat": -33.2323,
+    "lon": 151.53026,
+    "casualty": "Seriously Injured",
+    "road": "Buff Point Avenue, Buff Point",
+    "count": 1
+  },
+  {
+    "lat": -33.2291,
+    "lon": 151.54206,
+    "casualty": "Seriously Injured",
+    "road": "Scenic Drive, Budgewoi",
+    "count": 1
+  },
+  {
+    "lat": -33.23237,
+    "lon": 151.54799,
+    "casualty": "Moderately Injured",
+    "road": "Scenic Drive, Budgewoi",
+    "count": 1
+  },
+  {
+    "lat": -33.23382,
+    "lon": 151.55369,
+    "casualty": "Moderately Injured",
+    "road": "A49, Budgewoi",
+    "count": 2
+  },
+  {
+    "lat": -33.2347,
+    "lon": 151.55613,
+    "casualty": "Seriously Injured",
+    "road": "Scenic Drive, Budgewoi",
+    "count": 2
+  },
+  {
+    "lat": -33.23994,
+    "lon": 151.56541,
+    "casualty": "Moderately Injured",
+    "road": "A49, Budgewoi",
+    "count": 1
+  },
+  {
+    "lat": -33.23487,
+    "lon": 151.56819,
+    "casualty": "Seriously Injured",
+    "road": "Mimosa Road, Budgewoi",
+    "count": 1
+  },
+  {
+    "lat": -33.26293,
+    "lon": 151.52131,
+    "casualty": "Minor/Other Injured",
+    "road": "Main Road, Toukley",
+    "count": 1
+  },
+  {
+    "lat": -33.26262,
+    "lon": 151.52349,
+    "casualty": "Seriously Injured",
+    "road": "Viewpoint Drive, Toukley",
+    "count": 1
+  },
+  {
+    "lat": -33.26423,
+    "lon": 151.53454,
+    "casualty": "Moderately Injured",
+    "road": "Dunleigh Street, Toukley",
+    "count": 1
+  },
+  {
+    "lat": -33.265,
+    "lon": 151.542,
+    "casualty": "Seriously Injured",
+    "road": "Victoria Avenue, Toukley",
+    "count": 1
+  },
+  {
+    "lat": -33.26677,
+    "lon": 151.54671,
+    "casualty": "Moderately Injured",
+    "road": "Heador Street, Toukley",
+    "count": 2
+  },
+  {
+    "lat": -33.26829,
+    "lon": 151.55496,
+    "casualty": "Seriously Injured",
+    "road": "Main Road, Noraville",
+    "count": 1
+  },
+  {
+    "lat": -33.26887,
+    "lon": 151.55896,
+    "casualty": "Moderately Injured",
+    "road": "Main Road, Noraville",
+    "count": 1
+  },
+  {
+    "lat": -33.26906,
+    "lon": 151.56032,
+    "casualty": "Moderately Injured",
+    "road": "A49, Noraville",
+    "count": 1
+  },
+  {
+    "lat": -33.2686,
+    "lon": 151.56039,
+    "casualty": "Minor/Other Injured",
+    "road": "Budgewoi Road, Noraville",
+    "count": 1
+  },
+  {
+    "lat": -33.27066,
+    "lon": 151.55849,
+    "casualty": "Seriously Injured",
+    "road": "Brisbane Street, Noraville",
+    "count": 1
+  },
+  {
+    "lat": -33.27136,
+    "lon": 151.56009,
+    "casualty": "Moderately Injured",
+    "road": "Wilfred Barrett Drive, Norah Head",
+    "count": 1
+  },
+  {
+    "lat": -33.2753,
+    "lon": 151.55825,
+    "casualty": "Moderately Injured",
+    "road": "Wilfred Barrett Drive, Norah Head",
+    "count": 1
+  },
+  {
+    "lat": -33.27936,
+    "lon": 151.55559,
+    "casualty": "Seriously Injured",
+    "road": "Wilfred Barrett Drive, Noraville",
+    "count": 1
+  },
+  {
+    "lat": -33.27841,
+    "lon": 151.56436,
+    "casualty": "Moderately Injured",
+    "road": "Soldiers Point Drive, Norah Head",
+    "count": 1
+  },
+  {
+    "lat": -33.26578,
+    "lon": 151.4651,
+    "casualty": "Minor/Other Injured",
+    "road": "Orchid Way, Wadalba",
+    "count": 1
+  },
+  {
+    "lat": -33.26266,
+    "lon": 151.46471,
+    "casualty": "Seriously Injured",
+    "road": "Minnesota Road, Hamlyn Terrace",
+    "count": 5
+  },
+  {
+    "lat": -33.26189,
+    "lon": 151.46486,
+    "casualty": "Moderately Injured",
+    "road": "Minnesota Road, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.26175,
+    "lon": 151.45716,
+    "casualty": "Killed",
+    "road": "Pacific Highway, Wadalba",
+    "count": 2
+  },
+  {
+    "lat": -33.26547,
+    "lon": 151.45519,
+    "casualty": "Seriously Injured",
+    "road": "Wadalba",
+    "count": 1
+  },
+  {
+    "lat": -33.2501,
+    "lon": 151.46734,
+    "casualty": "Moderately Injured",
+    "road": "Warnervale Road, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.24874,
+    "lon": 151.45826,
+    "casualty": "Moderately Injured",
+    "road": "Warnervale Road, Warnervale",
+    "count": 1
+  },
+  {
+    "lat": -33.25137,
+    "lon": 151.47574,
+    "casualty": "Moderately Injured",
+    "road": "Louisiana Road, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.25157,
+    "lon": 151.4772,
+    "casualty": "Moderately Injured",
+    "road": "Warnervale Road, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.24856,
+    "lon": 151.47723,
+    "casualty": "Moderately Injured",
+    "road": "Monarch Drive, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.24985,
+    "lon": 151.48291,
+    "casualty": "Minor/Other Injured",
+    "road": "Sparks Road, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.25197,
+    "lon": 151.48938,
+    "casualty": "Minor/Other Injured",
+    "road": "B70, Woongarrah",
+    "count": 1
+  },
+  {
+    "lat": -33.2527,
+    "lon": 151.48874,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, Hamlyn Terrace",
+    "count": 2
+  },
+  {
+    "lat": -33.24422,
+    "lon": 151.47212,
+    "casualty": "Seriously Injured",
+    "road": "Hiawatha Road, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.24229,
+    "lon": 151.49649,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Charmhaven",
+    "count": 1
+  },
+  {
+    "lat": -33.23872,
+    "lon": 151.49932,
+    "casualty": "Moderately Injured",
+    "road": "83, Lake Haven",
+    "count": 3
+  },
+  {
+    "lat": -33.23997,
+    "lon": 151.5018,
+    "casualty": "Minor/Other Injured",
+    "road": "Lake Haven Drive, Lake Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.24474,
+    "lon": 151.49738,
+    "casualty": "Moderately Injured",
+    "road": "Keswick Drive, Lake Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.24676,
+    "lon": 151.49785,
+    "casualty": "Moderately Injured",
+    "road": "Gorokan Drive, Lake Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.24898,
+    "lon": 151.50113,
+    "casualty": "Moderately Injured",
+    "road": "Gorokan Drive, Lake Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.24662,
+    "lon": 151.50561,
+    "casualty": "Moderately Injured",
+    "road": "Gorokan Drive, Lake Haven",
+    "count": 1
+  },
+  {
+    "lat": -33.25491,
+    "lon": 151.50318,
+    "casualty": "Moderately Injured",
+    "road": "Wallarah Road, Gorokan",
+    "count": 1
+  },
+  {
+    "lat": -33.25937,
+    "lon": 151.51475,
+    "casualty": "Moderately Injured",
+    "road": "Wallarah Road, Gorokan",
+    "count": 1
+  },
+  {
+    "lat": -33.25446,
+    "lon": 151.49678,
+    "casualty": "Moderately Injured",
+    "road": "B70, Kanwal",
+    "count": 2
+  },
+  {
+    "lat": -33.22155,
+    "lon": 151.50503,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Charmhaven",
+    "count": 2
+  },
+  {
+    "lat": -33.23005,
+    "lon": 151.50295,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Charmhaven",
+    "count": 2
+  },
+  {
+    "lat": -33.23469,
+    "lon": 151.50195,
+    "casualty": "Killed",
+    "road": "Pacific Highway, Charmhaven",
+    "count": 2
+  },
+  {
+    "lat": -33.23524,
+    "lon": 151.50168,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, Charmhaven",
+    "count": 1
+  },
+  {
+    "lat": -33.25593,
+    "lon": 151.4748,
+    "casualty": "Moderately Injured",
+    "road": "Louisiana Road, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.25557,
+    "lon": 151.48014,
+    "casualty": "Moderately Injured",
+    "road": "Primrose Drive, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.25701,
+    "lon": 151.48149,
+    "casualty": "Seriously Injured",
+    "road": "Gladioli Avenue, Hamlyn Terrace",
+    "count": 1
+  },
+  {
+    "lat": -33.26323,
+    "lon": 151.47328,
+    "casualty": "Moderately Injured",
+    "road": "Louisiana Road, Hamlyn Terrace",
+    "count": 2
+  },
+  {
+    "lat": -33.26418,
+    "lon": 151.4731,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, Kanwal",
+    "count": 3
+  },
+  {
+    "lat": -33.26194,
+    "lon": 151.48259,
+    "casualty": "Minor/Other Injured",
+    "road": "Pacific Highway, Kanwal",
+    "count": 1
+  },
+  {
+    "lat": -33.25394,
+    "lon": 151.49344,
+    "casualty": "Moderately Injured",
+    "road": "Walker Avenue, Kanwal",
+    "count": 1
+  },
+  {
+    "lat": -33.25868,
+    "lon": 151.48842,
+    "casualty": "Moderately Injured",
+    "road": "Walker Avenue, Kanwal",
+    "count": 1
+  },
+  {
+    "lat": -33.25742,
+    "lon": 151.49575,
+    "casualty": "Seriously Injured",
+    "road": "Minnamurra Road, Gorokan",
+    "count": 1
+  },
+  {
+    "lat": -33.26217,
+    "lon": 151.49601,
+    "casualty": "Seriously Injured",
+    "road": "Marks Road, Gorokan",
+    "count": 1
+  },
+  {
+    "lat": -33.26121,
+    "lon": 151.42656,
+    "casualty": "Seriously Injured",
+    "road": "Brittania Drive, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.26284,
+    "lon": 151.42999,
+    "casualty": "Moderately Injured",
+    "road": "Kitty Place, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.26397,
+    "lon": 151.42883,
+    "casualty": "Seriously Injured",
+    "road": "Brittania Drive, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.26597,
+    "lon": 151.42724,
+    "casualty": "Moderately Injured",
+    "road": "Harrington Close, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.26688,
+    "lon": 151.43207,
+    "casualty": "Seriously Injured",
+    "road": "Golf Links Drive, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.26759,
+    "lon": 151.43123,
+    "casualty": "Moderately Injured",
+    "road": "Brittania Drive, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.26858,
+    "lon": 151.43558,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.27062,
+    "lon": 151.43136,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.27436,
+    "lon": 151.42964,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, Watanobbi",
+    "count": 2
+  },
+  {
+    "lat": -33.27597,
+    "lon": 151.4269,
+    "casualty": "Moderately Injured",
+    "road": "Cutler Drive, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.27229,
+    "lon": 151.42539,
+    "casualty": "Seriously Injured",
+    "road": "Cutler Drive, Watanobbi",
+    "count": 1
+  },
+  {
+    "lat": -33.27761,
+    "lon": 151.4243,
+    "casualty": "Minor/Other Injured",
+    "road": "Chapman Avenue, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.27781,
+    "lon": 151.42495,
+    "casualty": "Moderately Injured",
+    "road": "Crystal Crescent, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.28117,
+    "lon": 151.42193,
+    "casualty": "Moderately Injured",
+    "road": "Anzac Avenue, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.26974,
+    "lon": 151.4056,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Motorway, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.25947,
+    "lon": 151.40358,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Motorway, Alison",
+    "count": 3
+  },
+  {
+    "lat": -33.26115,
+    "lon": 151.39398,
+    "casualty": "Seriously Injured",
+    "road": "Jilliby Road, Alison",
+    "count": 1
+  },
+  {
+    "lat": -33.2573,
+    "lon": 151.39746,
+    "casualty": "Minor/Other Injured",
+    "road": "Hue Hue Road, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.25312,
+    "lon": 151.39735,
+    "casualty": "Seriously Injured",
+    "road": "Hue Hue Road, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.24584,
+    "lon": 151.39899,
+    "casualty": "Seriously Injured",
+    "road": "Hue Hue Road, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.22685,
+    "lon": 151.41524,
+    "casualty": "Moderately Injured",
+    "road": "Hue Hue Road, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.22542,
+    "lon": 151.41702,
+    "casualty": "Seriously Injured",
+    "road": "Sparks Road, Jilliby",
+    "count": 3
+  },
+  {
+    "lat": -33.22586,
+    "lon": 151.42537,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Motorway, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.23065,
+    "lon": 151.4206,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Motorway, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.23007,
+    "lon": 151.4246,
+    "casualty": "Seriously Injured",
+    "road": "Sparks Road, Warnervale",
+    "count": 1
+  },
+  {
+    "lat": -33.2291,
+    "lon": 151.42296,
+    "casualty": "Moderately Injured",
+    "road": "Sparks Road, Warnervale",
+    "count": 1
+  },
+  {
+    "lat": -33.23114,
+    "lon": 151.42665,
+    "casualty": "Seriously Injured",
+    "road": "Sparks Road, Warnervale",
+    "count": 3
+  },
+  {
+    "lat": -33.2692,
+    "lon": 151.44015,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, Wyong",
+    "count": 2
+  },
+  {
+    "lat": -33.26939,
+    "lon": 151.44145,
+    "casualty": "Moderately Injured",
+    "road": "Pacific Highway, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.26987,
+    "lon": 151.44458,
+    "casualty": "Seriously Injured",
+    "road": "Pacific Highway, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.27102,
+    "lon": 151.45311,
+    "casualty": "Moderately Injured",
+    "road": "83, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.26694,
+    "lon": 151.44536,
+    "casualty": "Moderately Injured",
+    "road": "Donaldson Street, Wyong",
+    "count": 1
+  },
+  {
+    "lat": -33.27227,
+    "lon": 151.46101,
+    "casualty": "Moderately Injured",
+    "road": "Johns Road, Wadalba",
+    "count": 1
+  },
+  {
+    "lat": -33.26625,
+    "lon": 151.49,
+    "casualty": "Moderately Injured",
+    "road": "Stanley Street, Wyongah",
+    "count": 1
+  },
+  {
+    "lat": -33.24011,
+    "lon": 151.38083,
+    "casualty": "Seriously Injured",
+    "road": "Jilliby Road, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.27185,
+    "lon": 151.37291,
+    "casualty": "Seriously Injured",
+    "road": "Yarramalong Road, Wyong Creek",
+    "count": 1
+  },
+  {
+    "lat": -33.26839,
+    "lon": 151.33731,
+    "casualty": "Seriously Injured",
+    "road": "Yarramalong Road, Wyong Creek",
+    "count": 1
+  },
+  {
+    "lat": -33.20752,
+    "lon": 151.43148,
+    "casualty": "Seriously Injured",
+    "road": "Hue Hue Road, Jilliby",
+    "count": 1
+  },
+  {
+    "lat": -33.2107,
+    "lon": 151.43009,
+    "casualty": "Moderately Injured",
+    "road": "Hue Hue Road, Kiar",
+    "count": 1
+  },
+  {
+    "lat": -33.21477,
+    "lon": 151.42788,
+    "casualty": "Moderately Injured",
+    "road": "Hue Hue Road, Jilliby",
+    "count": 1
+  }
+]

@@ -1,0 +1,890 @@
+[
+  {
+    "lat": -33.18966,
+    "lon": 151.52896,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.18979,
+    "lon": 151.52895,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.19091,
+    "lon": 151.52783,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.19146,
+    "lon": 151.52762,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.19177,
+    "lon": 151.5276,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.19942,
+    "lon": 151.52266,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.19946,
+    "lon": 151.52269,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.20578,
+    "lon": 151.51639,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.20698,
+    "lon": 151.49904,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.20728,
+    "lon": 151.49906,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.20725,
+    "lon": 151.49906,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.20739,
+    "lon": 151.49976,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21373,
+    "lon": 151.5122,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21376,
+    "lon": 151.51218,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21374,
+    "lon": 151.51218,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21543,
+    "lon": 151.50991,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21545,
+    "lon": 151.51385,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21552,
+    "lon": 151.52057,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21804,
+    "lon": 151.51876,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21982,
+    "lon": 151.51537,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21258,
+    "lon": 151.5253,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22219,
+    "lon": 151.53584,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2186,
+    "lon": 151.53535,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2323,
+    "lon": 151.53026,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2291,
+    "lon": 151.54206,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23237,
+    "lon": 151.54799,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23391,
+    "lon": 151.55382,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23373,
+    "lon": 151.55356,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2347,
+    "lon": 151.55611,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23469,
+    "lon": 151.55614,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23994,
+    "lon": 151.56541,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23487,
+    "lon": 151.56819,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26293,
+    "lon": 151.52131,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26262,
+    "lon": 151.52349,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26423,
+    "lon": 151.53454,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.265,
+    "lon": 151.542,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26678,
+    "lon": 151.54671,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26676,
+    "lon": 151.54671,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26829,
+    "lon": 151.55496,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26887,
+    "lon": 151.55896,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26906,
+    "lon": 151.56032,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2686,
+    "lon": 151.56039,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27066,
+    "lon": 151.55849,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27136,
+    "lon": 151.56009,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2753,
+    "lon": 151.55825,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27936,
+    "lon": 151.55559,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27841,
+    "lon": 151.56436,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26578,
+    "lon": 151.4651,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2628,
+    "lon": 151.46468,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26278,
+    "lon": 151.46468,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26281,
+    "lon": 151.4647,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26189,
+    "lon": 151.46486,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26175,
+    "lon": 151.45715,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26175,
+    "lon": 151.45717,
+    "casualty": "Killed",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26547,
+    "lon": 151.45519,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26247,
+    "lon": 151.46476,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26246,
+    "lon": 151.46475,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2501,
+    "lon": 151.46734,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24874,
+    "lon": 151.45826,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25137,
+    "lon": 151.47574,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25157,
+    "lon": 151.4772,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24856,
+    "lon": 151.47723,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24985,
+    "lon": 151.48291,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25197,
+    "lon": 151.48938,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25268,
+    "lon": 151.48875,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25273,
+    "lon": 151.48873,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24422,
+    "lon": 151.47212,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24229,
+    "lon": 151.49649,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23875,
+    "lon": 151.49921,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23877,
+    "lon": 151.49924,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23864,
+    "lon": 151.4995,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23997,
+    "lon": 151.5018,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24474,
+    "lon": 151.49738,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24676,
+    "lon": 151.49785,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24898,
+    "lon": 151.50113,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24662,
+    "lon": 151.50561,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25491,
+    "lon": 151.50318,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25937,
+    "lon": 151.51475,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25446,
+    "lon": 151.49675,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25445,
+    "lon": 151.49682,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2216,
+    "lon": 151.50501,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22149,
+    "lon": 151.50505,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22995,
+    "lon": 151.50295,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23014,
+    "lon": 151.50295,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23461,
+    "lon": 151.502,
+    "casualty": "Killed",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23477,
+    "lon": 151.50189,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23524,
+    "lon": 151.50168,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25593,
+    "lon": 151.4748,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25557,
+    "lon": 151.48014,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25701,
+    "lon": 151.48149,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26316,
+    "lon": 151.47329,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2633,
+    "lon": 151.47328,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26415,
+    "lon": 151.4731,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2642,
+    "lon": 151.47311,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26418,
+    "lon": 151.47309,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26194,
+    "lon": 151.48259,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25394,
+    "lon": 151.49344,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25868,
+    "lon": 151.48842,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25742,
+    "lon": 151.49575,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26217,
+    "lon": 151.49601,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26121,
+    "lon": 151.42656,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26284,
+    "lon": 151.42999,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26397,
+    "lon": 151.42883,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26597,
+    "lon": 151.42724,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26688,
+    "lon": 151.43207,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26759,
+    "lon": 151.43123,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26858,
+    "lon": 151.43558,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27062,
+    "lon": 151.43136,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27434,
+    "lon": 151.42964,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27438,
+    "lon": 151.42963,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27597,
+    "lon": 151.4269,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27229,
+    "lon": 151.42539,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27761,
+    "lon": 151.4243,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27781,
+    "lon": 151.42495,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.28117,
+    "lon": 151.42193,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26974,
+    "lon": 151.4056,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2594,
+    "lon": 151.40356,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2594,
+    "lon": 151.40358,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25961,
+    "lon": 151.4036,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26115,
+    "lon": 151.39398,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2573,
+    "lon": 151.39746,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.25312,
+    "lon": 151.39735,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24584,
+    "lon": 151.39899,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22685,
+    "lon": 151.41524,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22543,
+    "lon": 151.41701,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22543,
+    "lon": 151.41702,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22541,
+    "lon": 151.41703,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.22586,
+    "lon": 151.42537,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23065,
+    "lon": 151.4206,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23007,
+    "lon": 151.4246,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2291,
+    "lon": 151.42296,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23115,
+    "lon": 151.42664,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23115,
+    "lon": 151.42666,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.23113,
+    "lon": 151.42664,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26918,
+    "lon": 151.44009,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26923,
+    "lon": 151.4402,
+    "casualty": "Minor/Other Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26939,
+    "lon": 151.44145,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26987,
+    "lon": 151.44458,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27102,
+    "lon": 151.45311,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26694,
+    "lon": 151.44536,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27227,
+    "lon": 151.46101,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26625,
+    "lon": 151.49,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.24011,
+    "lon": 151.38083,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.27185,
+    "lon": 151.37291,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.26839,
+    "lon": 151.33731,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.20752,
+    "lon": 151.43148,
+    "casualty": "Seriously Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.2107,
+    "lon": 151.43009,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  },
+  {
+    "lat": -33.21477,
+    "lon": 151.42788,
+    "casualty": "Moderately Injured",
+    "road": "Road not specified"
+  }
+]
