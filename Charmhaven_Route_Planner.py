@@ -330,6 +330,60 @@ def midpoint(coords):
     return coords[len(coords) // 2]
 
 
+def prepend_coord(path_coords, coord, tolerance=1e-6):
+    if not path_coords:
+        return [coord]
+    if abs(path_coords[0][0] - coord[0]) > tolerance or abs(path_coords[0][1] - coord[1]) > tolerance:
+        return [coord] + path_coords
+    return path_coords
+
+
+def append_coord(path_coords, coord, tolerance=1e-6):
+    if not path_coords:
+        return [coord]
+    if abs(path_coords[-1][0] - coord[0]) > tolerance or abs(path_coords[-1][1] - coord[1]) > tolerance:
+        return path_coords + [coord]
+    return path_coords
+
+
+def offset_latlon(lat, lon, index, total, radius_m=42):
+    if total <= 1:
+        return lat, lon
+    angle = (2 * math.pi * index) / total
+    lat_offset = (radius_m / 111320) * math.sin(angle)
+    lon_scale = max(math.cos(math.radians(lat)), 0.25)
+    lon_offset = (radius_m / (111320 * lon_scale)) * math.cos(angle)
+    return lat + lat_offset, lon + lon_offset
+
+
+def add_display_offsets(df, key_cols=("lat", "lon"), precision=3, radius_m=42):
+    df = df.copy()
+    crowd_key = (
+        df[list(key_cols)]
+        .round(precision)
+        .astype(str)
+        .agg("|".join, axis=1)
+    )
+    df["_crowd_key"] = crowd_key
+    df["_crowd_index"] = df.groupby("_crowd_key").cumcount()
+    df["_crowd_size"] = df.groupby("_crowd_key")["_crowd_key"].transform("size")
+
+    display_points = df.apply(
+        lambda row: offset_latlon(
+            row["lat"],
+            row["lon"],
+            int(row["_crowd_index"]),
+            int(row["_crowd_size"]),
+            radius_m=radius_m,
+        ),
+        axis=1,
+    )
+    df["display_lat"] = display_points.apply(lambda pt: pt[0])
+    df["display_lon"] = display_points.apply(lambda pt: pt[1])
+    df["crowd_size"] = df["_crowd_size"]
+    return df.drop(columns=["_crowd_key", "_crowd_index", "_crowd_size"])
+
+
 def simulate_leg_conditions(row, leg_distance_m, leg_time_s, arrival_hour, stop_order):
     """leg_time_s: OSM-speed-based travel time in seconds (from time_matrix)."""
     triggers = []
@@ -741,16 +795,18 @@ print("-" * 56)
 
 print("\nBuilding route map...")
 zone_hull = MultiPoint(list(zip(route_df["lon"], route_df["lat"]))).convex_hull
+route_df = add_display_offsets(route_df, radius_m=36)
 map_center = [route_df["lat"].mean(), route_df["lon"].mean()]
-m = folium.Map(location=map_center, zoom_start=11, tiles="OpenStreetMap")
+m = folium.Map(location=map_center, zoom_start=11, tiles="OpenStreetMap", prefer_canvas=True, control_scale=True)
 
 if zone_hull.geom_type == "Polygon":
     hull_coords = [(y, x) for x, y in zone_hull.exterior.coords]
     folium.PolyLine(
         hull_coords,
-        color="#8d99ae",
+        color="#5c677d",
         weight=2,
-        opacity=0.8,
+        opacity=0.88,
+        dash_array="6 10",
         tooltip=f"{ZONE_FILTER} route extent",
     ).add_to(m)
 
@@ -769,12 +825,27 @@ for leg_number in range(1, len(node_seq)):
         continue
 
     path_coords = [(G.nodes[node]["y"], G.nodes[node]["x"]) for node in path_nodes]
+    if leg_number == 1:
+        start_coord = (DEPOT_LAT, DEPOT_LON)
+    else:
+        prev_stop = route_lookup.get(leg_number - 1)
+        start_coord = (prev_stop["lat"], prev_stop["lon"]) if prev_stop else path_coords[0]
+    end_coord = (stop_info["lat"], stop_info["lon"])
+    path_coords = prepend_coord(path_coords, start_coord)
+    path_coords = append_coord(path_coords, end_coord)
     line_color = TRAFFIC_COLORS[stop_info["traffic_state"]]
+    folium.PolyLine(
+        path_coords,
+        color="#ffffff",
+        weight=8,
+        opacity=0.7,
+    ).add_to(m)
     folium.PolyLine(
         path_coords,
         color=line_color,
         weight=4,
-        opacity=0.85,
+        opacity=0.95,
+        smooth_factor=1.2,
         tooltip=(
             f"Segment {leg_number}: {stop_info['leg_distance_km']:.2f} km | "
             f"{stop_info['simulated_travel_min']:.1f} min | "
@@ -783,20 +854,37 @@ for leg_number in range(1, len(node_seq)):
     ).add_to(m)
 
     mid = midpoint(path_coords)
-    if mid:
+    show_segment_label = (
+        mid
+        and (
+            len(route_lookup) <= 10
+            or leg_number in {1, len(route_lookup)}
+            or stop_info["leg_distance_km"] >= 8
+            or leg_number % 4 == 0
+        )
+    )
+    if show_segment_label:
         folium.Marker(
             location=mid,
             icon=folium.DivIcon(
                 html=(
-                    f"<div style='font-size:10px;font-weight:700;color:#1d3557;"
-                    f"background:#ffffffcc;border:1px solid #457b9d;border-radius:10px;"
-                    f"padding:2px 6px;'>S{leg_number}</div>"
+                    f"<div style='font-size:10px;font-weight:700;color:#264653;"
+                    f"background:#ffffffe0;border:1px solid #9db4c0;border-radius:10px;"
+                    f"padding:1px 6px;box-shadow:0 1px 4px rgba(0,0,0,.15);'>"
+                    f"L{leg_number}</div>"
                 )
             ),
         ).add_to(m)
 
 for _, row in route_df.iterrows():
     band_color = PRIORITY_COLORS[row["priority_band"]]
+    if row["crowd_size"] > 1:
+        folium.PolyLine(
+            [(row["lat"], row["lon"]), (row["display_lat"], row["display_lon"])],
+            color=band_color,
+            weight=1.2,
+            opacity=0.45,
+        ).add_to(m)
     popup_html = (
         f"<b>Stop {int(row['stop_order'])}</b><br>"
         f"<b>Location:</b> {html.escape(row['specific_location'])}<br>"
@@ -814,7 +902,7 @@ for _, row in route_df.iterrows():
         f"<b>Alert:</b> {html.escape(row['alert_message'])}"
     )
     folium.Marker(
-        location=[row["lat"], row["lon"]],
+        location=[row["display_lat"], row["display_lon"]],
         popup=folium.Popup(popup_html, max_width=360),
         tooltip=(
             f"Stop {int(row['stop_order'])}: "
@@ -824,9 +912,10 @@ for _, row in route_df.iterrows():
         ),
         icon=folium.DivIcon(
             html=(
-                f"<div style='width:28px;height:28px;border-radius:14px;"
-                f"background:{band_color};color:white;text-align:center;line-height:28px;"
-                f"font-weight:700;border:2px solid white;box-shadow:0 0 4px rgba(0,0,0,.4);'>"
+                f"<div style='width:24px;height:24px;border-radius:12px;"
+                f"background:{band_color};color:white;text-align:center;"
+                f"font-weight:700;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,.28);"
+                f"font-size:12px;line-height:20px;'>"
                 f"{int(row['stop_order'])}</div>"
             )
         ),
@@ -928,9 +1017,12 @@ for from_ui_idx, from_row in interactive_df.iterrows():
 
     try:
         depot_to_nodes = nx.shortest_path(G, all_nodes[0], all_nodes[from_node_seq_idx], weight="length")
-        interactive_path_lookup[f"depot-{from_ui_idx}"] = [
+        depot_path = [
             [float(G.nodes[node]["y"]), float(G.nodes[node]["x"])] for node in depot_to_nodes
         ]
+        depot_path = prepend_coord(depot_path, (DEPOT_LAT, DEPOT_LON))
+        depot_path = append_coord(depot_path, (float(from_row["lat"]), float(from_row["lon"])))
+        interactive_path_lookup[f"depot-{from_ui_idx}"] = depot_path
     except nx.NetworkXNoPath:
         interactive_path_lookup[f"depot-{from_ui_idx}"] = [
             [DEPOT_LAT, DEPOT_LON],
@@ -948,9 +1040,12 @@ for from_ui_idx, from_row in interactive_df.iterrows():
                 all_nodes[to_node_seq_idx],
                 weight="length",
             )
-            interactive_path_lookup[f"{from_ui_idx}-{to_ui_idx}"] = [
+            path_coords = [
                 [float(G.nodes[node]["y"]), float(G.nodes[node]["x"])] for node in path_nodes
             ]
+            path_coords = prepend_coord(path_coords, (float(from_row["lat"]), float(from_row["lon"])))
+            path_coords = append_coord(path_coords, (float(to_row["lat"]), float(to_row["lon"])))
+            interactive_path_lookup[f"{from_ui_idx}-{to_ui_idx}"] = path_coords
         except nx.NetworkXNoPath:
             interactive_path_lookup[f"{from_ui_idx}-{to_ui_idx}"] = [
                 [float(from_row["lat"]), float(from_row["lon"])],
@@ -1384,6 +1479,30 @@ legend_html = f"""
     return total;
   }}
 
+  function offsetMarkerPositions(points, radiusMeters = 36) {{
+    const groups = new Map();
+    points.forEach((point, index) => {{
+      const key = point.lat.toFixed(3) + '|' + point.lon.toFixed(3);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(index);
+    }});
+
+    const adjusted = points.map((point) => ({{ ...point, displayLat: point.lat, displayLon: point.lon }}));
+    groups.forEach((indices) => {{
+      if (indices.length <= 1) return;
+      indices.forEach((pointIndex, groupIndex) => {{
+        const point = adjusted[pointIndex];
+        const angle = (Math.PI * 2 * groupIndex) / indices.length;
+        const latOffset = (radiusMeters / 111320) * Math.sin(angle);
+        const lonScale = Math.max(Math.cos(point.lat * Math.PI / 180), 0.25);
+        const lonOffset = (radiusMeters / (111320 * lonScale)) * Math.cos(angle);
+        point.displayLat = point.lat + latOffset;
+        point.displayLon = point.lon + lonOffset;
+      }});
+    }});
+    return adjusted;
+  }}
+
   function getRoadPath(fromKey, toKey) {{
     return roadPathLookup[fromKey + '-' + toKey] || null;
   }}
@@ -1485,11 +1604,11 @@ legend_html = f"""
     accidentHotspots.forEach((h) => {{
       const isActive = activeSet.has(h.lat + ',' + h.lon);
       const color  = CASUALTY_COLORS[h.casualty] || '#888';
-      const radius = isActive ? 14 : 8;
-      const opacity = isActive ? 1.0 : 0.25;
+      const radius = isActive ? 14 : 4;
+      const opacity = isActive ? 1.0 : 0.12;
       const ring = isActive
         ? 'box-shadow:0 0 0 4px ' + color + '66,0 0 12px ' + color + '99,0 2px 6px rgba(0,0,0,.4);'
-        : 'box-shadow:0 1px 3px rgba(0,0,0,.15);';
+        : 'box-shadow:none;border:1px solid rgba(255,255,255,.5);';
 
       const marker = L.marker([h.lat, h.lon], {{
         icon: L.divIcon({{
@@ -1596,24 +1715,36 @@ legend_html = f"""
     customRouteLayer = L.layerGroup().addTo(map);
 
     const latlngs = [[depotPoint.lat, depotPoint.lon]];
-    result.route.forEach((defect, index) => {{
-      const lineColor = trafficColor(defect.trafficFactor);
+    const displayRoute = offsetMarkerPositions(result.route);
+    displayRoute.forEach((defect, index) => {{
+      const lineColor = '#111111';
       L.polyline(
         defect.pathCoords || [[depotPoint.lat, depotPoint.lon], [defect.lat, defect.lon]],
-        {{ color: lineColor, weight: 5, opacity: 0.88, dashArray: '10 8' }}
+        {{ color: '#ffffff', weight: 9, opacity: 0.72, smoothFactor: 1.2 }}
+      ).addTo(customRouteLayer);
+      L.polyline(
+        defect.pathCoords || [[depotPoint.lat, depotPoint.lon], [defect.lat, defect.lon]],
+        {{ color: lineColor, weight: 5, opacity: 0.96, smoothFactor: 1.2 }}
       ).addTo(customRouteLayer);
 
       if (defect.pathCoords) defect.pathCoords.forEach((c) => latlngs.push(c));
       else latlngs.push([defect.lat, defect.lon]);
 
-      const marker = L.marker([defect.lat, defect.lon], {{
+      if (Math.abs(defect.displayLat - defect.lat) > 1e-6 || Math.abs(defect.displayLon - defect.lon) > 1e-6) {{
+        L.polyline(
+          [[defect.lat, defect.lon], [defect.displayLat, defect.displayLon]],
+          {{ color: lineColor, weight: 1.2, opacity: 0.45 }}
+        ).addTo(customRouteLayer);
+      }}
+
+      const marker = L.marker([defect.displayLat, defect.displayLon], {{
         icon: L.divIcon({{
           className: '',
-          html: '<div style="width:30px;height:30px;border-radius:15px;background:' + lineColor +
-                ';color:white;text-align:center;line-height:30px;font-weight:700;' +
+          html: '<div style="width:26px;height:26px;border-radius:13px;background:' + lineColor +
+                ';color:white;text-align:center;line-height:22px;font-weight:700;font-size:12px;' +
                 'border:2px solid white;box-shadow:0 4px 10px rgba(0,0,0,.25);">' + (index + 1) + '</div>',
-          iconSize: [30, 30],
-          iconAnchor: [15, 15],
+          iconSize: [26, 26],
+          iconAnchor: [13, 13],
         }})
       }});
       const delayPct = Math.round((defect.trafficFactor - 1) * 100);
@@ -1635,6 +1766,13 @@ legend_html = f"""
     }});
 
     if (latlngs.length > 1) map.fitBounds(latlngs, {{ padding: [50, 50] }});
+  }}
+
+  function clearCustomRoute() {{
+    if (customRouteLayer) {{
+      customRouteLayer.remove();
+      customRouteLayer = null;
+    }}
   }}
 
   function updateCustomRouteSummary(result) {{
@@ -1675,6 +1813,7 @@ legend_html = f"""
     const selected = getSelectedDefects();
     const summary = document.getElementById('custom-route-summary');
     if (selected.length < 2) {{
+      clearCustomRoute();
       summary.innerHTML = 'Please select at least 2 existing defects.';
       return;
     }}
@@ -1692,6 +1831,16 @@ legend_html = f"""
 
     const generateBtn = document.getElementById('generate-custom-route');
     if (generateBtn) generateBtn.addEventListener('click', generateCustomRoute);
+
+    document.querySelectorAll('.existing-defect-checkbox').forEach((box) => {{
+      box.addEventListener('change', () => {{
+        if (getSelectedDefects().length < 2) {{
+          clearCustomRoute();
+          const summary = document.getElementById('custom-route-summary');
+          if (summary) summary.innerHTML = 'Please select at least 2 existing defects.';
+        }}
+      }});
+    }});
 
     const selectTopBtn = document.getElementById('select-top-defects');
     if (selectTopBtn) {{
