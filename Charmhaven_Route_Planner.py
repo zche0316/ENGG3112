@@ -396,17 +396,20 @@ def simulate_leg_conditions(row, leg_distance_m, leg_time_s, arrival_hour, stop_
     freight_peak = row["freight_corridor_candidate"] and hour_in_window(arrival_hour, *PEAK_WINDOWS["freight_peak"])
     incident = stable_bucket(f"{row['defect_number']}-{stop_order}", 8) == 0
 
+    traffic_subtypes = []
     if school_peak:
-        triggers.append("school peak traffic")
+        traffic_subtypes.append("school peak")
         factor += 0.18
     if work_peak:
-        triggers.append("work commute traffic")
+        traffic_subtypes.append("work commute")
         factor += 0.12
     if freight_peak:
-        triggers.append("freight delivery traffic")
+        traffic_subtypes.append("freight delivery")
         factor += 0.10
+    if traffic_subtypes:
+        triggers.append(f"Traffic ({', '.join(traffic_subtypes)})")
     if incident:
-        triggers.append("incident nearby")
+        triggers.append("historical crash hotspot nearby")
         factor += 0.22
 
     # Base time from OSM speed data (road-type-aware), not a blanket 40 km/h assumption
@@ -441,64 +444,73 @@ def simulate_leg_conditions(row, leg_distance_m, leg_time_s, arrival_hour, stop_
     }
 
 
-def build_data_input_panel(defect_locations_html, alert_rows_html, defect_selector_html, departure_time_str, incident_total):
+def build_data_input_panel(alert_rows_html, defect_selector_html, departure_time_str, incident_total, expected_daily):
     sample_path = html.escape(DATASET_PATH)
     return f"""
 <div class="planner-panel planner-sidebar">
   <div class="panel-header">
     <div>
-      <div class="panel-title">Defect Input And Route Context</div>
-      <div class="panel-subtitle">Departure time, manual input, dataset source, precise defect locations, alerts, and legend.</div>
+      <div class="panel-title">Route Planner</div>
+      <div class="panel-subtitle">Follow steps 1–4 to configure and generate your maintenance route.</div>
     </div>
     <button class="toggle-btn" onclick="togglePanel(this)" title="Collapse / expand">▾</button>
   </div>
   <div class="panel-body">
 
   <div class="planner-section" style="padding-top:0;border-top:none;">
-    <div class="section-title">Departure Time</div>
-    <div class="helper-text">Set the crew departure time. Traffic simulation and incident congestion update automatically.</div>
+    <div class="section-title section-title-row" onclick="toggleSection(this)">Step 1 — Departure Time<span class="section-arrow">▾</span></div>
+    <div class="section-body">
     <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
       <input id="departure-time-input" type="time" value="{departure_time_str}"
              class="planner-input" style="width:120px;font-size:16px;font-weight:700;padding:8px 10px;">
       <div style="font-size:12px;color:var(--text-soft);">
         <span id="incident-active-count" style="font-weight:700;color:#d32f2f;">0</span>
-        of <span id="incident-total-count">{incident_total}</span> historical hotspots active today
+        of <span id="incident-total-count">{incident_total}</span> hotspots shown on map
       </div>
     </div>
+    </div>
   </div>
 
   <div class="planner-section">
-    <div class="section-title">Today's Active Incidents</div>
+    <div class="section-title section-title-row" onclick="toggleSection(this)">Step 2 — Active Crash Hotspots<span class="section-arrow">▾</span></div>
+    <div class="section-body">
     <div class="helper-text">
-      Hotspot data covers all of 2024 ({incident_total} recorded locations).
-      Set how many are treated as active today — higher-severity sites are selected first.
-      Active incidents create congestion zones that increase travel time on nearby legs.
+      Historical crash data covers 2024 ({incident_total} locations · est. <b>{expected_daily:.0f}</b> daily casualty events in area · source: NSW iROADS/Power BI).
+      Use the slider to set how many highest-severity sites appear on the map.
+      Active hotspots increase simulated travel time on nearby route legs.
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-      <input id="incident-count-slider" type="range" min="0" max="{incident_total}" value="2"
+      <input id="incident-count-slider" type="range" min="0" max="{incident_total}" value="5"
              style="flex:1;accent-color:#d32f2f;">
-      <strong id="incident-count-value" style="min-width:24px;color:#d32f2f;">2</strong>
-      <button class="planner-btn planner-btn-secondary" style="padding:5px 12px;"
-              onclick="rerandomizeIncidents()">Shuffle</button>
+      <strong id="incident-count-value" style="min-width:24px;color:#d32f2f;">5</strong>
     </div>
     <div class="helper-text" style="margin-top:6px;" id="incident-impact-text">
-      Drag slider then click Shuffle to activate a random subset weighted by casualty severity.
+      Hotspots are selected by severity (Killed first, then Seriously Injured, etc.).
+    </div>
     </div>
   </div>
 
   <div class="planner-section">
-    <div class="section-title">Manual Defect Input</div>
-    <div class="helper-text">Enter a defect address directly in the HTML page.</div>
-    <input class="planner-input planner-address-input" type="text" placeholder="Enter defect address">
-    <div class="button-row">
-      <button class="planner-btn planner-btn-primary">Add Defect</button>
+    <div class="section-title section-title-row" onclick="toggleSection(this)">Step 3 — Select Defect Sites<span class="section-arrow">▾</span></div>
+    <div class="section-body">
+    <div class="helper-text">
+      Sites are listed by ranking score. Tick the ones to include, then adjust priority weights below.
     </div>
-    <div class="helper-text">UI only: this simplified field currently shows the input interface but does not submit data.</div>
+    <div class="button-row" style="margin-bottom:6px;">
+      <button class="planner-btn planner-btn-secondary" id="select-first-10">Select First 10</button>
+      <button class="planner-btn planner-btn-secondary" id="select-all-defects">Select All</button>
+      <button class="planner-btn planner-btn-secondary" id="deselect-all-defects">Deselect All</button>
+    </div>
+    <div class="selector-list" id="existing-defect-selector">
+      {defect_selector_html}
+    </div>
+    </div>
   </div>
 
   <div class="planner-section">
-    <div class="section-title">Interactive Existing Defect Route Planner</div>
-    <div class="helper-text">Select multiple existing defects, adjust weights, and generate an optimal route directly in the HTML page.</div>
+    <div class="section-title section-title-row" onclick="toggleSection(this)">Step 4 — Priority Weights &amp; Generate Route<span class="section-arrow">▾</span></div>
+    <div class="section-body">
+    <div class="helper-text">Adjust the importance of each factor, then click Generate Route.</div>
     <div class="planner-weight-grid">
       <label class="weight-control">
         <span>Severity</span>
@@ -528,62 +540,41 @@ def build_data_input_panel(defect_locations_html, alert_rows_html, defect_select
     </div>
     <div class="button-row">
       <button class="planner-btn planner-btn-primary" id="generate-custom-route">Generate Route</button>
-      <button class="planner-btn planner-btn-secondary" id="select-top-defects">Select Top 10</button>
-    </div>
-    <div class="selector-list" id="existing-defect-selector">
-      {defect_selector_html}
     </div>
     <div id="custom-route-summary" class="data-card" style="margin-top:10px;">
-      Choose at least 2 defects to generate a weighted route.
+      Select at least 2 sites and click Generate Route.
     </div>
-  </div>
-
-  <div class="planner-section">
-    <div class="section-title">Current Dataset Source</div>
-    <div class="data-card">
-      <div><b>Current dataset:</b> {sample_path}</div>
-      <div><b>Zone filter:</b> {html.escape(ZONE_FILTER)}</div>
-      <div><b>Status filter:</b> {html.escape(STATUS_FILTER)}</div>
-    </div>
-    <div class="helper-text" style="margin-top:8px;">
-      Expected CSV fields: `Name`, `description`, `lat`, `lon`. Scalable input is intended for 20+ defects.
-    </div>
-  </div>
-
-  <div class="planner-section">
-    <div class="section-title">Precise Defect Locations On Map</div>
-    <div class="helper-text">Locations should use full addresses, road segments, or coordinates rather than vague place names.</div>
-    <div class="location-list">
-      {defect_locations_html}
     </div>
   </div>
 
   <div class="planner-section planner-alert-section">
-    <div class="section-title">Traffic, Incident, And Peak-Hour Alerts</div>
-    <div class="helper-text">Incidents plus school, work, and freight peak-hour effects are shown clearly.</div>
-    <div class="alert-list">
+    <div class="section-title section-title-row" onclick="toggleSection(this)">Traffic &amp; Incident Alerts<span class="section-arrow">▾</span></div>
+    <div class="section-body">
+    <div class="helper-text">Traffic congestion (school, work commute, freight) and historical crash hotspot effects on route legs.</div>
+    <div class="alert-list" id="traffic-alert-list">
       {alert_rows_html}
+    </div>
     </div>
   </div>
 
   <div class="planner-section">
-    <div class="section-title">Clear Legend</div>
-    <div class="legend-list">
-      <div><span class="legend-dot" style="background:#c62828;"></span>Immediate repair need</div>
-      <div><span class="legend-dot" style="background:#ef6c00;"></span>High-impact connector repair</div>
-      <div><span class="legend-dot" style="background:#1565c0;"></span>Planned connector repair</div>
-      <div><span class="legend-dot" style="background:#546e7a;"></span>Routine local street repair</div>
-      <div><span class="legend-line" style="background:#2a9d8f;"></span>Light traffic</div>
-      <div><span class="legend-line" style="background:#f4a261;"></span>Moderate traffic</div>
-      <div><span class="legend-line" style="background:#d62828;"></span>Heavy traffic</div>
-      <div><span class="legend-home">⌂</span>Depot</div>
-      <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text-soft);">Historical crash casualties</div>
-      <div><span class="casualty-legend-dot" style="background:#e53935;"></span>Killed</div>
-      <div><span class="casualty-legend-dot" style="background:#fb8c00;"></span>Seriously Injured</div>
-      <div><span class="casualty-legend-dot" style="background:#37474f;"></span>Moderately Injured</div>
-      <div><span class="casualty-legend-dot" style="background:#00acc1;"></span>Minor / Other Injured</div>
+    <div class="section-title" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;"
+         onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.ds-arrow').textContent=b.style.display==='none'?'▸':'▾';">
+      Dataset Source <span class="ds-arrow" style="font-size:11px;color:var(--text-soft);">▸</span>
+    </div>
+    <div style="display:none;">
+      <div class="data-card" style="margin-top:8px;">
+        <div><b>Defect data:</b> {sample_path}</div>
+        <div style="margin-top:4px;font-size:11px;color:var(--text-soft);">
+          Source: Central Coast Council iROADS road maintenance dataset, Charmhaven Zone, outstanding defects.
+          Crash hotspot data: NSW iROADS / Power BI 2024.
+          Fuel estimate: {FUEL_EFFICIENCY_L_PER_100KM:.1f} L/100 km @ AUD {FUEL_PRICE_AUD_PER_L:.2f}/L
+          (ref: IPWEA Fleet Management Guidelines, light truck class).
+        </div>
+      </div>
     </div>
   </div>
+
   </div>
 </div>
 """
@@ -888,7 +879,6 @@ for _, row in route_df.iterrows():
     popup_html = (
         f"<b>Stop {int(row['stop_order'])}</b><br>"
         f"<b>Location:</b> {html.escape(row['specific_location'])}<br>"
-        f"<b>Why ranked here:</b> {html.escape(row['priority_reason'])}<br>"
         f"<b>Priority band:</b> {html.escape(row['priority_band'])}<br>"
         f"<b>Ranking score:</b> {row['ranking_score_pct']:.1f}/100<br>"
         f"<b>Travel from previous stop:</b> {row['leg_distance_km']:.2f} km<br>"
@@ -897,7 +887,6 @@ for _, row in route_df.iterrows():
         f"<b>Traffic delay:</b> +{row['traffic_delay_min']:.1f} min<br>"
         f"<b>Service time on site:</b> {int(row['service_time_min'])} min<br>"
         f"<b>Fuel for this leg:</b> {row['fuel_litres']:.2f} L (AUD {row['fuel_cost_aud']:.2f})<br>"
-        f"<b>Arrival time:</b> {row['arrival_time']}<br>"
         f"<b>Traffic state:</b> {row['traffic_state']}<br>"
         f"<b>Alert:</b> {html.escape(row['alert_message'])}"
     )
@@ -923,19 +912,15 @@ for _, row in route_df.iterrows():
     segment_rows_html.append(
         "<tr>"
         f"<td>{int(row['stop_order'])}</td>"
-        f"<td>{html.escape((row['road_name'] or 'Unnamed road')[:24])}</td>"
+        f"<td style='white-space:normal;word-break:break-word;max-width:140px;'>{html.escape(row['road_name'] or 'Unnamed road')}</td>"
         f"<td>{row['leg_distance_km']:.2f} km</td>"
         f"<td>{row['simulated_travel_min']:.1f} min</td>"
         f"<td>AUD {row['fuel_cost_aud']:.2f}</td>"
-        f"<td>{html.escape(row['priority_reason'][:40])}</td>"
+        f"<td style='white-space:normal;word-break:break-word;max-width:200px;'>{html.escape(row['priority_reason'])}</td>"
         "</tr>"
     )
 
-folium.Marker(
-    location=[DEPOT_LAT, DEPOT_LON],
-    tooltip="Depot",
-    icon=folium.Icon(color="black", icon="home", prefix="fa"),
-).add_to(m)
+# Depot marker is rendered via JS in permanentPane so it stays visible when base layers are dimmed
 
 # ── Incident hotspot data for JS rendering ────────────────────────────────────
 expected_daily_incidents = sum(
@@ -961,27 +946,59 @@ alert_rows_html = "".join(
 if not alert_rows_html:
     alert_rows_html = "<div>No medium or high alerts in the current simulation window.</div>"
 
-defect_locations_html = "".join(
-    f"<div class='location-item'><span class='location-stop'>Stop {int(row['stop_order'])}</span> "
-    f"{html.escape(precise_location_hint(row))}</div>"
-    for _, row in route_df.iterrows()
-)
-if not defect_locations_html:
-    defect_locations_html = "<div>No defect locations available.</div>"
+
+_ROAD_SUFFIX_ABBR = {
+    "Avenue": "Ave", "Drive": "Dr", "Street": "St", "Road": "Rd",
+    "Lane": "Ln", "Place": "Pl", "Court": "Ct", "Close": "Cl",
+    "Crescent": "Cres", "Parade": "Pde", "Boulevard": "Blvd",
+    "Highway": "Hwy", "Way": "Way", "Circuit": "Cct", "Terrace": "Tce",
+}
+
+def _abbr_road(name: str) -> str:
+    if not name:
+        return "Unknown"
+    parts = str(name).split()
+    if parts and parts[-1] in _ROAD_SUFFIX_ABBR:
+        parts[-1] = _ROAD_SUFFIX_ABBR[parts[-1]]
+    return " ".join(parts)
 
 interactive_df = pts.copy()
+interactive_df = interactive_df.sort_values(["ranking_score", "num_potholes"], ascending=[False, False]).reset_index(drop=True)
+
+# Build stable location-based short labels; disambiguate duplicates with A/B/C…
+_road_counters: dict = {}
+_site_labels = []
+for _, row in interactive_df.iterrows():
+    base = _abbr_road(row.get("street_name") or row.get("dataset_name", ""))
+    count = _road_counters.get(base, 0)
+    _road_counters[base] = count + 1
+    _site_labels.append(base)
+
+# Second pass: add suffix only where the road name appears more than once
+_road_total = {k: v for k, v in _road_counters.items()}
+_road_seen: dict = {}
+_final_labels = []
+for label in _site_labels:
+    if _road_total[label] > 1:
+        idx_letter = _road_seen.get(label, 0)
+        _road_seen[label] = idx_letter + 1
+        suffix = chr(ord("A") + idx_letter)
+        _final_labels.append(f"{label}-{suffix}")
+    else:
+        _final_labels.append(label)
+
+interactive_df["site_label"] = _final_labels
 interactive_df["ui_label"] = interactive_df.apply(
-    lambda row: f"{row['defect_number']} | {row['specific_location']}",
+    lambda row: f"{row['site_label']} | {row['specific_location']}",
     axis=1,
 )
-interactive_df = interactive_df.sort_values(["ranking_score", "num_potholes"], ascending=[False, False]).reset_index(drop=True)
 default_selected_ids = interactive_df.head(min(10, len(interactive_df))).index.tolist()
 defect_selector_html = "".join(
     (
         f"<label class='selector-item'>"
         f"<input type='checkbox' class='existing-defect-checkbox' value='{idx}' "
         f"{'checked' if idx in default_selected_ids else ''}>"
-        f"<span class='selector-text'><b>{html.escape(str(row['defect_number']))}</b><br>"
+        f"<span class='selector-text'><b>{html.escape(str(row['site_label']))}</b><br>"
         f"{html.escape(str(row['specific_location']))}</span>"
         f"</label>"
     )
@@ -995,6 +1012,7 @@ for idx, row in interactive_df.iterrows():
     interactive_route_records.append(
         {
             "id": idx,
+            "site_label": row["site_label"],
             "defect_number": row["defect_number"],
             "specific_location": row["specific_location"],
             "lat": float(row["lat"]),
@@ -1083,12 +1101,6 @@ legend_html = f"""
     width: 380px;
     max-height: calc(100vh - 48px);
     overflow: auto;
-    padding: 16px;
-  }}
-  .planner-card-top {{
-    top: 24px;
-    right: 24px;
-    width: 360px;
     padding: 16px;
   }}
   .planner-card-bottom {{
@@ -1339,53 +1351,124 @@ legend_html = f"""
     opacity: 0;
   }}
   .casualty-legend-dot {{
-    width: 11px; height: 11px; border-radius: 50%;
+    width: 11px; height: 11px;
     display: inline-block; flex: 0 0 11px;
     border: 1px solid rgba(0,0,0,0.18);
+    /* Diamond shape to distinguish from repair priority circles */
+    transform: rotate(45deg);
   }}
+  .planner-map-legend {{
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    width: 210px;
+    padding: 14px 16px;
+    pointer-events: auto;
+  }}
+  .legend-dash {{
+    width: 24px;
+    height: 2px;
+    display: inline-block;
+    flex: 0 0 24px;
+    border-top: 2px dashed #5c677d;
+  }}
+
+  /* ── Custom-route focus: dim all base layers, keep custom route sharp ── */
+  .leaflet-container.map-dimmed .leaflet-overlay-pane,
+  .leaflet-container.map-dimmed .leaflet-marker-pane,
+  .leaflet-container.map-dimmed .leaflet-shadow-pane,
+  .leaflet-container.map-dimmed .leaflet-tooltip-pane {{
+    opacity: 0.12;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }}
+  .leaflet-container .leaflet-customRoutePane-pane,
+  .leaflet-container .leaflet-permanentPane-pane {{
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }}
+  /* ── Step collapsibles ── */
+  .section-title-row {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }}
+  .section-arrow {{
+    font-size: 11px;
+    color: var(--text-soft);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }}
+  .section-body {{
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.2s ease;
+    max-height: 2000px;
+    opacity: 1;
+  }}
+  .section-body.collapsed {{
+    max-height: 0 !important;
+    opacity: 0;
+  }}
+  /* ── Draggable panels ── */
+  .panel-header.draggable {{ cursor: grab; }}
+  .panel-header.dragging  {{ cursor: grabbing !important; }}
 </style>
-{build_data_input_panel(defect_locations_html, alert_rows_html, defect_selector_html, departure_time_str, len(ACCIDENT_HOTSPOTS))}
-<div class="planner-panel planner-card-top">
-  <div class="panel-header">
-    <div>
-      <div class="panel-title">Decision Factors And Weights</div>
-      <div class="panel-subtitle">Prioritisation logic and crash hotspot summary.</div>
-    </div>
+{build_data_input_panel(alert_rows_html, defect_selector_html, departure_time_str, len(ACCIDENT_HOTSPOTS), expected_daily_incidents)}
+
+<!-- Map-side legend: always visible next to the map -->
+<div class="planner-panel planner-map-legend">
+  <div class="panel-header" style="margin-bottom:10px;">
+    <div class="panel-title" style="font-size:15px;">Legend</div>
     <button class="toggle-btn" onclick="togglePanel(this)" title="Collapse / expand">▾</button>
   </div>
   <div class="panel-body">
-  <table class="metric-table">
-    <tr><th align="left">Factor</th><th align="right">Weight</th></tr>
-    {weight_rows_html}
-  </table>
-  <div class="helper-text" style="margin-top:10px;">
-    Main route computed at: {hour_to_label(SIMULATION_START_HOUR)} — adjust departure in left panel.<br>
-    Fuel: {FUEL_EFFICIENCY_L_PER_100KM:.1f} L/100 km @ AUD {FUEL_PRICE_AUD_PER_L:.2f}/L<br>
-    Historical crash hotspots: <b>{len(ACCIDENT_HOTSPOTS)}</b> locations in area<br>
-    Est. daily casualty events: <b>{expected_daily_incidents:.0f}</b><br>
-    Map only shows defects included in the final route.
+  <div class="legend-list">
+    <div style="font-size:11px;font-weight:700;color:var(--text-soft);margin-bottom:4px;">Repair Priority (circles)</div>
+    <div><span class="legend-dot" style="background:#c62828;"></span>Immediate repair need</div>
+    <div><span class="legend-dot" style="background:#ef6c00;"></span>High-impact connector</div>
+    <div><span class="legend-dot" style="background:#1565c0;"></span>Planned connector repair</div>
+    <div><span class="legend-dot" style="background:#546e7a;"></span>Routine local repair</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-soft);margin-top:8px;margin-bottom:4px;">Route Traffic (lines)</div>
+    <div><span class="legend-line" style="background:#2a9d8f;"></span>Light traffic</div>
+    <div><span class="legend-line" style="background:#f4a261;"></span>Moderate traffic</div>
+    <div><span class="legend-line" style="background:#d62828;"></span>Heavy traffic</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-soft);margin-top:8px;margin-bottom:4px;">Historical Crashes (diamonds)</div>
+    <div><span class="casualty-legend-dot" style="background:#e53935;"></span>Killed</div>
+    <div><span class="casualty-legend-dot" style="background:#fb8c00;"></span>Seriously Injured</div>
+    <div><span class="casualty-legend-dot" style="background:#37474f;"></span>Moderately Injured</div>
+    <div><span class="casualty-legend-dot" style="background:#00acc1;"></span>Minor / Other Injured</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-soft);margin-top:8px;margin-bottom:4px;">Other</div>
+    <div><span class="legend-home">⌂</span>Crew depot</div>
+    <div><span class="legend-dash"></span>Route extent boundary</div>
   </div>
   </div>
 </div>
+
 <div class="planner-panel planner-card-bottom">
   <div class="panel-header">
     <div>
       <div class="panel-title">Route Dashboard</div>
-      <div class="panel-subtitle">Per-segment time, distance, cost, and justification.</div>
+      <div class="panel-subtitle">Per-segment time, distance, cost, and justification. Updates when you generate a custom route.</div>
     </div>
     <button class="toggle-btn" onclick="togglePanel(this)" title="Collapse / expand">▾</button>
   </div>
   <div class="panel-body">
-  <table class="dashboard-table">
+  <table class="dashboard-table" id="route-dashboard-table">
+    <thead>
     <tr>
       <th align="left">Stop</th>
       <th align="left">Road</th>
       <th align="left">Leg</th>
       <th align="left">Drive</th>
       <th align="left">Fuel</th>
-      <th align="left">Reason</th>
+      <th align="left">Priority reason</th>
     </tr>
+    </thead>
+    <tbody id="route-dashboard-tbody">
     {''.join(segment_rows_html)}
+    </tbody>
   </table>
   </div>
 </div>
@@ -1397,13 +1480,14 @@ legend_html = f"""
   let customRouteLayer = null;
   let incidentLayer = null;
   let activeIncidents = [];   // subset of accidentHotspots active today
+  let currentRouteStops = []; // lat/lon of stops in the active custom route
 
-  // Severity weights: higher = more likely to be selected as "active"
-  const CASUALTY_SEVERITY_WEIGHT = {{
-    'Killed':             4,
-    'Seriously Injured':  3,
-    'Moderately Injured': 2,
-    'Minor/Other Injured':1,
+  // Severity rank (lower = higher severity = selected first)
+  const CASUALTY_SEVERITY_RANK = {{
+    'Killed':             1,
+    'Seriously Injured':  2,
+    'Moderately Injured': 3,
+    'Minor/Other Injured':4,
   }};
 
   // ── Map accessor ─────────────────────────────────────────────────────────────
@@ -1518,34 +1602,29 @@ legend_html = f"""
 
   // ── Active incident management ────────────────────────────────────────────────
 
-  // Weighted random selection of n hotspots (higher severity = more likely)
-  function activateIncidentsRandom(n) {{
+  // Deterministic: select top-N hotspots by severity order (Killed first, then SI, MI, Other)
+  function activateTopIncidents(n) {{
     if (n <= 0)  {{ activeIncidents = []; return; }}
-    if (n >= accidentHotspots.length) {{ activeIncidents = [...accidentHotspots]; return; }}
+    const sorted = [...accidentHotspots].sort((a, b) =>
+      (CASUALTY_SEVERITY_RANK[a.casualty] || 5) - (CASUALTY_SEVERITY_RANK[b.casualty] || 5)
+    );
+    activeIncidents = sorted.slice(0, n);
+  }}
 
-    // Build cumulative weight table
-    const weights = accidentHotspots.map(h => CASUALTY_SEVERITY_WEIGHT[h.casualty] || 1);
-    const totalW  = weights.reduce((s, w) => s + w, 0);
-
-    const selected = new Set();
-    let attempts = 0;
-    while (selected.size < n && attempts < n * 20) {{
-      attempts++;
-      let r = Math.random() * totalW;
-      for (let i = 0; i < accidentHotspots.length; i++) {{
-        r -= weights[i];
-        if (r <= 0) {{ selected.add(i); break; }}
-      }}
+  // Returns true if a hotspot is within ROUTE_FILTER_KM of any current route stop
+  const ROUTE_FILTER_KM = 3.0;
+  function isHotspotNearRoute(h) {{
+    if (!currentRouteStops.length) return true; // show all if no route yet
+    for (const stop of currentRouteStops) {{
+      if (haversineKm({{lat: h.lat, lon: h.lon}}, stop) <= ROUTE_FILTER_KM) return true;
     }}
-    activeIncidents = Array.from(selected).map(i => accidentHotspots[i]);
+    return false;
   }}
 
   // Congestion factor for a route leg based on proximity to active incidents
-  // pathCoords: [[lat,lon], ...] — checks sampled points along the whole path
   function incidentCongestionForPath(pathCoords) {{
     if (!activeIncidents.length) return 1.0;
     const coords = pathCoords || [];
-    // Sample up to 12 evenly spaced points along the path
     const step = Math.max(1, Math.floor(coords.length / 12));
     let maxFactor = 1.0;
     for (const inc of activeIncidents) {{
@@ -1553,9 +1632,9 @@ legend_html = f"""
       for (let i = 0; i < coords.length; i += step) {{
         const km = haversineKm({{ lat: coords[i][0], lon: coords[i][1] }}, incPt);
         let f = 1.0;
-        if      (km < 0.30) f = 1.40;   // <300 m : heavy congestion
-        else if (km < 0.70) f = 1.22;   // <700 m : moderate
-        else if (km < 1.50) f = 1.09;   // <1.5 km: light spillback
+        if      (km < 0.30) f = 1.40;
+        else if (km < 0.70) f = 1.22;
+        else if (km < 1.50) f = 1.09;
         if (f > maxFactor) maxFactor = f;
         if (maxFactor >= 1.40) break;
       }}
@@ -1564,22 +1643,19 @@ legend_html = f"""
     return maxFactor;
   }}
 
-  // Slider + shuffle handler
-  function rerandomizeIncidents() {{
+  // Slider handler — deterministic, no shuffle
+  function updateIncidents() {{
     const n = Number(document.getElementById('incident-count-slider').value);
-    activateIncidentsRandom(n);
-    // Update counter label
+    activateTopIncidents(n);
     const countEl = document.getElementById('incident-active-count');
     if (countEl) countEl.textContent = activeIncidents.length;
-    // Update impact text
     const el = document.getElementById('incident-impact-text');
     if (el) {{
       if (!activeIncidents.length) {{
-        el.textContent = 'No active incidents — route uses time-of-day traffic only.';
+        el.textContent = 'No hotspots active — route uses time-of-day traffic only.';
       }} else {{
         const roads = [...new Set(activeIncidents.map(h => h.road.split(',')[0]))].slice(0, 3).join(', ');
-        el.textContent = activeIncidents.length + ' active incident(s) near: ' + roads +
-                         '. Nearby route legs show increased travel time.';
+        el.textContent = activeIncidents.length + ' hotspot(s) near: ' + roads + '. Nearby legs show increased travel time.';
       }}
     }}
     renderIncidentLayer();
@@ -1601,29 +1677,35 @@ legend_html = f"""
     incidentLayer = L.layerGroup().addTo(map);
     const activeSet = new Set(activeIncidents.map(h => h.lat + ',' + h.lon));
 
-    accidentHotspots.forEach((h) => {{
+    // Only render hotspots near the current route stops
+    const visibleHotspots = accidentHotspots.filter(h => isHotspotNearRoute(h));
+
+    visibleHotspots.forEach((h) => {{
       const isActive = activeSet.has(h.lat + ',' + h.lon);
       const color  = CASUALTY_COLORS[h.casualty] || '#888';
-      const radius = isActive ? 14 : 4;
-      const opacity = isActive ? 1.0 : 0.12;
-      const ring = isActive
-        ? 'box-shadow:0 0 0 4px ' + color + '66,0 0 12px ' + color + '99,0 2px 6px rgba(0,0,0,.4);'
-        : 'box-shadow:none;border:1px solid rgba(255,255,255,.5);';
+      // Diamond shape: use a rotated square to distinguish from round repair-priority markers
+      const size = isActive ? 14 : 7;
+      const opacity = isActive ? 1.0 : 0.35;
+      const shadow = isActive
+        ? 'box-shadow:0 0 0 3px ' + color + '55,0 2px 6px rgba(0,0,0,.4);'
+        : 'box-shadow:none;';
 
       const marker = L.marker([h.lat, h.lon], {{
+        pane: 'permanentPane',
         icon: L.divIcon({{
           className: '',
-          html: '<div style="width:' + radius + 'px;height:' + radius + 'px;border-radius:50%;' +
-                'background:' + color + ';opacity:' + opacity + ';' + ring + '"></div>',
-          iconSize: [radius, radius],
-          iconAnchor: [radius / 2, radius / 2],
+          html: '<div style="width:' + size + 'px;height:' + size + 'px;' +
+                'background:' + color + ';opacity:' + opacity + ';' +
+                'transform:rotate(45deg);' + shadow + '"></div>',
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
         }})
       }});
 
       const statusNote = isActive
-        ? '<span style="color:#d32f2f;font-weight:700;">\u26a0 ACTIVE TODAY — congestion zone active</span>'
-        : '<span style="color:#888;">Historical record only (not active today)</span>';
-      marker.bindPopup('<b>' + h.casualty + '</b><br>' + h.road + '<br>' + statusNote);
+        ? '<span style="color:#d32f2f;font-weight:700;">\u26a0 Active — congestion zone on nearby legs</span>'
+        : '<span style="color:#888;">Historical record (not currently active)</span>';
+      marker.bindPopup('<b>Crash casualty: ' + h.casualty + '</b><br>' + h.road + '<br>' + statusNote);
       marker.addTo(incidentLayer);
     }});
 
@@ -1707,6 +1789,69 @@ legend_html = f"""
     return {{ route, totalKm, totalHours: totalH, totalMins: totalM }};
   }}
 
+  // ── Info panel helpers ────────────────────────────────────────────────────────
+  // Store default (full-route) HTML once so we can restore it later
+  let _defaultAlertHTML = null;
+
+  function _saveDefaultPanels() {{
+    if (_defaultAlertHTML !== null) return;
+    const alertEl = document.getElementById('traffic-alert-list');
+    if (alertEl) _defaultAlertHTML = alertEl.innerHTML;
+  }}
+
+  function _stopAlertLevel(d) {{
+    if (d.incidentDelay || d.trafficLabel === 'Heavy')   return 'High';
+    if (d.trafficLabel === 'Moderate') return 'Medium';
+    const nearCrash = accidentHotspots.some(
+      h => haversineKm({{lat: h.lat, lon: h.lon}}, {{lat: d.lat, lon: d.lon}}) <= 3.0
+    );
+    return nearCrash ? 'Medium' : 'Low';
+  }}
+
+  function _stopAlertMsg(d) {{
+    const parts = [];
+    if (d.incidentDelay)              parts.push('incident congestion');
+    if (d.trafficLabel === 'Heavy')   parts.push('heavy traffic');
+    if (d.trafficLabel === 'Moderate') parts.push('moderate traffic');
+    const nearCrash = accidentHotspots.some(
+      h => haversineKm({{lat: h.lat, lon: h.lon}}, {{lat: d.lat, lon: d.lon}}) <= 3.0
+    );
+    if (nearCrash) parts.push('historical crash hotspot nearby');
+    return parts.length ? parts.join(', ') : 'normal conditions';
+  }}
+
+  const ALERT_COLORS = {{ High: '#fde8e8', Medium: '#fff4e0', Low: '#f0f4ff' }};
+  const ALERT_BORDER = {{ High: '#f5a3a3', Medium: '#ffc87a', Low: '#c3d4f7' }};
+
+  function updateInfoPanels(result) {{
+    _saveDefaultPanels();
+    const alertEl = document.getElementById('traffic-alert-list');
+
+    // ── Traffic & Incident Alerts ─────────────────────────────────────────────
+    if (alertEl) {{
+      const alerts = result.route
+        .map((d, i) => ({{ stop: i + 1, d, level: _stopAlertLevel(d), msg: _stopAlertMsg(d) }}))
+        .filter(a => a.level !== 'Low');
+      if (!alerts.length) {{
+        alertEl.innerHTML = '<div>No medium or high alerts on this route.</div>';
+      }} else {{
+        alertEl.innerHTML = alerts.map(a =>
+          '<div style="background:' + ALERT_COLORS[a.level] + ';' +
+               'border:1px solid ' + ALERT_BORDER[a.level] + ';' +
+               'border-radius:10px;padding:8px 10px;margin-bottom:8px;">' +
+            '<b>Stop ' + a.stop + '</b> at ' + a.d.arrivalTime + ': ' +
+            a.level + ' alert — ' + a.msg +
+          '</div>'
+        ).join('');
+      }}
+    }}
+  }}
+
+  function resetInfoPanels() {{
+    const alertEl = document.getElementById('traffic-alert-list');
+    if (alertEl && _defaultAlertHTML !== null) alertEl.innerHTML = _defaultAlertHTML;
+  }}
+
   // ── Map rendering ─────────────────────────────────────────────────────────────
   function renderCustomRoute(result) {{
     const map = getLeafletMap();
@@ -1714,17 +1859,21 @@ legend_html = f"""
     if (customRouteLayer) {{ customRouteLayer.remove(); }}
     customRouteLayer = L.layerGroup().addTo(map);
 
+    // Hide crash hotspots when a custom route is active
+    currentRouteStops = result.route.map(d => ({{ lat: d.lat, lon: d.lon }}));
+    if (incidentLayer) {{ incidentLayer.remove(); incidentLayer = null; }}
+
     const latlngs = [[depotPoint.lat, depotPoint.lon]];
     const displayRoute = offsetMarkerPositions(result.route);
     displayRoute.forEach((defect, index) => {{
       const lineColor = '#111111';
       L.polyline(
         defect.pathCoords || [[depotPoint.lat, depotPoint.lon], [defect.lat, defect.lon]],
-        {{ color: '#ffffff', weight: 9, opacity: 0.72, smoothFactor: 1.2 }}
+        {{ color: '#ffffff', weight: 9, opacity: 0.72, smoothFactor: 1.2, pane: 'customRoutePane' }}
       ).addTo(customRouteLayer);
       L.polyline(
         defect.pathCoords || [[depotPoint.lat, depotPoint.lon], [defect.lat, defect.lon]],
-        {{ color: lineColor, weight: 5, opacity: 0.96, smoothFactor: 1.2 }}
+        {{ color: lineColor, weight: 5, opacity: 0.96, smoothFactor: 1.2, pane: 'customRoutePane' }}
       ).addTo(customRouteLayer);
 
       if (defect.pathCoords) defect.pathCoords.forEach((c) => latlngs.push(c));
@@ -1733,11 +1882,12 @@ legend_html = f"""
       if (Math.abs(defect.displayLat - defect.lat) > 1e-6 || Math.abs(defect.displayLon - defect.lon) > 1e-6) {{
         L.polyline(
           [[defect.lat, defect.lon], [defect.displayLat, defect.displayLon]],
-          {{ color: lineColor, weight: 1.2, opacity: 0.45 }}
+          {{ color: lineColor, weight: 1.2, opacity: 0.45, pane: 'customRoutePane' }}
         ).addTo(customRouteLayer);
       }}
 
       const marker = L.marker([defect.displayLat, defect.displayLon], {{
+        pane: 'customRoutePane',
         icon: L.divIcon({{
           className: '',
           html: '<div style="width:26px;height:26px;border-radius:13px;background:' + lineColor +
@@ -1753,11 +1903,9 @@ legend_html = f"""
         : '';
       marker.bindPopup(
         '<b>Stop ' + (index + 1) + '</b><br>' +
-        defect.defect_number + '<br>' +
         defect.specific_location + '<br>' +
-        'Arrive: ~' + defect.arrivalTime + '<br>' +
         'Drive: ' + Math.round(defect.driveMin) + ' min' +
-          (delayPct > 0 ? ' (+' + delayPct + '% ' + defect.trafficLabel + ' traffic)' : '') +
+          (delayPct > 0 ? ' (+' + delayPct + '% traffic delay)' : '') +
         incNote + '<br>' +
         'Leg distance: ' + defect.legKm.toFixed(2) + ' km<br>' +
         'Priority score: ' + (defect.priorityScore * 100).toFixed(1) + ' / 100'
@@ -1766,6 +1914,8 @@ legend_html = f"""
     }});
 
     if (latlngs.length > 1) map.fitBounds(latlngs, {{ padding: [50, 50] }});
+    map.getContainer().classList.add('map-dimmed');
+    updateInfoPanels(result);
   }}
 
   function clearCustomRoute() {{
@@ -1773,30 +1923,43 @@ legend_html = f"""
       customRouteLayer.remove();
       customRouteLayer = null;
     }}
+    currentRouteStops = [];
+    const map = getLeafletMap();
+    if (map) map.getContainer().classList.remove('map-dimmed');
+    resetInfoPanels();
+    renderIncidentLayer();
   }}
 
   function updateCustomRouteSummary(result) {{
     const summary = document.getElementById('custom-route-summary');
     if (!result.route.length) {{
-      summary.innerHTML = 'Choose at least 2 defects to generate a weighted route.';
+      summary.innerHTML = 'Select at least 2 sites and click Generate Route.';
       return;
     }}
     const depInput = document.getElementById('departure-time-input');
     const depStr = depInput ? depInput.value : hourToLabel({SIMULATION_START_HOUR});
-    const rows = result.route.map((d, i) =>
-      '<div style="margin-top:5px;"><b>' + (i + 1) + '.</b> ' + d.defect_number +
-      ' | ' + d.legKm.toFixed(2) + ' km' +
-      ' | drive ' + Math.round(d.driveMin) + ' min' +
-      ' | arrive ~' + d.arrivalTime +
-      ' | ' + d.trafficLabel + ' traffic' +
-      ' | score ' + (d.priorityScore * 100).toFixed(1) + '/100</div>'
-    ).join('');
     summary.innerHTML =
-      '<b>Route — depart ' + depStr + '</b><br>' +
+      '<b>Custom route — depart ' + depStr + '</b><br>' +
       '<span class="helper-text">Stops: ' + result.route.length +
       ' | Distance: ' + result.totalKm.toFixed(2) + ' km' +
-      ' | Total time: ' + result.totalHours + 'h ' + result.totalMins + 'min (incl. service)</span>' +
-      rows;
+      ' | Total time: ' + result.totalHours + 'h ' + result.totalMins + 'min (incl. service)</span>';
+
+    // Update the Route Dashboard table to reflect the custom route
+    const tbody = document.getElementById('route-dashboard-tbody');
+    if (tbody) {{
+      const fuelRate = {FUEL_EFFICIENCY_L_PER_100KM} / 100 * {FUEL_PRICE_AUD_PER_L};
+      tbody.innerHTML = result.route.map((d, i) => {{
+        const fuelAud = (d.legKm * fuelRate).toFixed(2);
+        return '<tr>' +
+          '<td>' + (i + 1) + '</td>' +
+          '<td style="white-space:normal;word-break:break-word;max-width:140px;">' + (d.specific_location || d.defect_number || '—') + '</td>' +
+          '<td>' + d.legKm.toFixed(2) + ' km</td>' +
+          '<td>' + Math.round(d.driveMin) + ' min<br><span style="font-size:10px;color:#888;">' + d.trafficLabel + '</span></td>' +
+          '<td>AUD ' + fuelAud + '</td>' +
+          '<td style="white-space:normal;word-break:break-word;max-width:200px;">Score ' + (d.priorityScore * 100).toFixed(1) + '/100</td>' +
+          '</tr>';
+      }}).join('');
+    }}
   }}
 
   function syncWeightLabels() {{
@@ -1822,12 +1985,56 @@ legend_html = f"""
     renderCustomRoute(result);
   }}
 
+  // ── Section toggle ───────────────────────────────────────────────────────────
+  function toggleSection(titleEl) {{
+    const body = titleEl.nextElementSibling;
+    if (!body || !body.classList.contains('section-body')) return;
+    const isCollapsed = body.classList.toggle('collapsed');
+    const arrow = titleEl.querySelector('.section-arrow');
+    if (arrow) arrow.style.transform = isCollapsed ? 'rotate(-90deg)' : '';
+  }}
+
+  // ── Draggable panels ──────────────────────────────────────────────────────────
+  function makeDraggable(panel) {{
+    const header = panel.querySelector('.panel-header');
+    if (!header) return;
+    header.classList.add('draggable');
+    let startX, startY, startLeft, startTop;
+    header.addEventListener('mousedown', (e) => {{
+      if (e.target.closest('.toggle-btn')) return;
+      e.preventDefault();
+      const rect = panel.getBoundingClientRect();
+      startX = e.clientX; startY = e.clientY;
+      startLeft = rect.left; startTop = rect.top;
+      panel.style.transform = 'none';
+      panel.style.left = startLeft + 'px';
+      panel.style.top  = startTop  + 'px';
+      panel.style.right  = 'auto';
+      panel.style.bottom = 'auto';
+      header.classList.add('dragging');
+      function onMove(e) {{
+        panel.style.left = (startLeft + e.clientX - startX) + 'px';
+        panel.style.top  = (startTop  + e.clientY - startY) + 'px';
+      }}
+      function onUp() {{
+        header.classList.remove('dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }}
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    }});
+  }}
+
   // ── Bootstrap ─────────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {{
     syncWeightLabels();
     document.querySelectorAll('.weight-control input[type=range]').forEach((inp) => {{
       inp.addEventListener('input', syncWeightLabels);
     }});
+
+    // Make Route Dashboard, Legend and Route Planner sidebar draggable
+    document.querySelectorAll('.planner-card-bottom, .planner-map-legend, .planner-sidebar').forEach(makeDraggable);
 
     const generateBtn = document.getElementById('generate-custom-route');
     if (generateBtn) generateBtn.addEventListener('click', generateCustomRoute);
@@ -1837,43 +2044,92 @@ legend_html = f"""
         if (getSelectedDefects().length < 2) {{
           clearCustomRoute();
           const summary = document.getElementById('custom-route-summary');
-          if (summary) summary.innerHTML = 'Please select at least 2 existing defects.';
+          if (summary) summary.innerHTML = 'Select at least 2 sites and click Generate Route.';
         }}
       }});
     }});
 
-    const selectTopBtn = document.getElementById('select-top-defects');
-    if (selectTopBtn) {{
-      selectTopBtn.addEventListener('click', () => {{
+    // "Select First 10" — selects the first 10 checkboxes in list order (not priority-ranked)
+    const selectFirst10Btn = document.getElementById('select-first-10');
+    if (selectFirst10Btn) {{
+      selectFirst10Btn.addEventListener('click', () => {{
         Array.from(document.querySelectorAll('.existing-defect-checkbox'))
           .forEach((box, i) => {{ box.checked = i < 10; }});
         generateCustomRoute();
       }});
     }}
 
-    const depInput = document.getElementById('departure-time-input');
-    if (depInput) {{
-      depInput.addEventListener('change', () => {{
-        renderIncidentLayer();
+    // "Select All"
+    const selectAllBtn = document.getElementById('select-all-defects');
+    if (selectAllBtn) {{
+      selectAllBtn.addEventListener('click', () => {{
+        document.querySelectorAll('.existing-defect-checkbox').forEach(b => {{ b.checked = true; }});
         generateCustomRoute();
       }});
     }}
 
-    // Incident count slider — update label live, apply on release
+    // "Deselect All"
+    const deselectAllBtn = document.getElementById('deselect-all-defects');
+    if (deselectAllBtn) {{
+      deselectAllBtn.addEventListener('click', () => {{
+        document.querySelectorAll('.existing-defect-checkbox').forEach(b => {{ b.checked = false; }});
+        clearCustomRoute();
+        const summary = document.getElementById('custom-route-summary');
+        if (summary) summary.innerHTML = 'Select at least 2 sites and click Generate Route.';
+      }});
+    }}
+
+    const depInput = document.getElementById('departure-time-input');
+    if (depInput) {{
+      depInput.addEventListener('change', () => {{
+        updateIncidents();
+        generateCustomRoute();
+      }});
+    }}
+
+    // Incident count slider — update label live, apply deterministically on input
     const incSlider = document.getElementById('incident-count-slider');
     if (incSlider) {{
       incSlider.addEventListener('input', () => {{
         document.getElementById('incident-count-value').textContent = incSlider.value;
       }});
-      incSlider.addEventListener('change', rerandomizeIncidents);
+      incSlider.addEventListener('change', updateIncidents);
     }}
 
     setTimeout(() => {{
-      // Default: activate 2 incidents on load
-      activateIncidentsRandom(2);
-      document.getElementById('incident-count-value').textContent = '2';
-      rerandomizeIncidents();
+      // Default: activate top 5 hotspots by severity on load
+      activateTopIncidents(5);
+      document.getElementById('incident-count-value').textContent = '5';
+      updateIncidents();
     }}, 650);
+
+    // Create dedicated Leaflet panes that stay fully visible even when base layers are dimmed
+    setTimeout(() => {{
+      const map = getLeafletMap();
+      if (!map) return;
+      if (!map.getPane('permanentPane')) {{
+        map.createPane('permanentPane');
+        map.getPane('permanentPane').style.zIndex = '550';
+      }}
+      if (!map.getPane('customRoutePane')) {{
+        map.createPane('customRoutePane');
+        map.getPane('customRoutePane').style.zIndex = '650';
+      }}
+      // Depot marker — rendered here so it lives in permanentPane and is never dimmed
+      L.marker([depotPoint.lat, depotPoint.lon], {{
+        pane: 'permanentPane',
+        icon: L.divIcon({{
+          className: '',
+          html: '<div style="width:36px;height:36px;border-radius:50%;background:#212121;' +
+                'display:flex;align-items:center;justify-content:center;' +
+                'box-shadow:0 3px 10px rgba(0,0,0,.5);border:3px solid white;">' +
+                '<i class="fa fa-home" style="color:white;font-size:16px;"></i></div>',
+          iconSize: [36, 36],
+          iconAnchor: [18, 18],
+        }}),
+        zIndexOffset: 1000,
+      }}).addTo(map).bindTooltip('Crew Depot', {{ permanent: false, direction: 'right' }});
+    }}, 300);
   }});
 </script>
 """
