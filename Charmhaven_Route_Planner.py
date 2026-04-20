@@ -4,6 +4,10 @@ import html
 import math
 import os
 import re
+import uuid
+from datetime import datetime, timezone
+
+import requests
 
 import folium
 import networkx as nx
@@ -21,17 +25,130 @@ STATUS_FILTER = os.environ.get("STATUS_FILTER", "Outstanding")
 
 DEPOT_LAT = -33.236718
 DEPOT_LON = 151.493981
-AVERAGE_SPEED_KMH = 40
+AVERAGE_SPEED_KMH = 30          # urban road-maintenance operations
 SIMULATION_START_HOUR = 7.5
-FUEL_EFFICIENCY_L_PER_100KM = 11.5
-FUEL_PRICE_AUD_PER_L = 2.05
+FUEL_EFFICIENCY_L_PER_100KM = 18.0  # Bergkamp SP5 carrier truck + PTO load
+FUEL_PRICE_AUD_PER_L = 2.05  # fallback if API unavailable
+
+NSW_FUEL_API_BASE  = "https://api.onegov.nsw.gov.au"
+NSW_FUEL_AUTH_HDR  = os.environ.get(
+    "NSW_FUEL_AUTH_HDR",
+    "Basic S3huOER1VHJkQUxxaDRzMUp0cGk1dW1SeWhiR20zRFg6Wm42eVJlNnFodk54R0tZdQ==",
+)
+NSW_FUEL_APIKEY    = os.environ.get("NSW_FUEL_APIKEY", "Kxn8DuTrdALqh4s1Jtpi5umRyhbGm3DX")
+NSW_FUEL_TYPE      = os.environ.get("NSW_FUEL_TYPE", "DL")   # DL = Diesel
+NSW_FUEL_RADIUS_KM = 10
+
+
+def _get_nsw_fuel_token() -> str | None:
+    """Exchange Basic credentials for an OAuth2 Bearer token."""
+    try:
+        resp = requests.post(
+            f"{NSW_FUEL_API_BASE}/oauth/client_credential/accesstoken",
+            params={"grant_type": "client_credentials"},
+            headers={"Authorization": NSW_FUEL_AUTH_HDR, "Content-Type": "application/json"},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json().get("access_token")
+    except Exception as exc:
+        print(f"[FuelAPI] Token request failed: {exc}")
+        return None
+
+
+def fetch_live_fuel_price(lat: float, lon: float) -> float:
+    """Return the cheapest nearby diesel price (AUD/L) or the fallback constant."""
+    token = _get_nsw_fuel_token()
+    if not token:
+        print(f"[FuelAPI] Using fallback price AUD {FUEL_PRICE_AUD_PER_L:.2f}/L")
+        return FUEL_PRICE_AUD_PER_L
+
+    now_utc = datetime.now(timezone.utc).strftime("%d/%m/%Y %I:%M:%S %p")
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json; charset=utf-8",
+        "apikey": NSW_FUEL_APIKEY,
+        "transactionid": str(uuid.uuid4()),
+        "requesttimestamp": now_utc,
+    }
+    body = {
+        "latitude": lat,
+        "longitude": lon,
+        "radius": NSW_FUEL_RADIUS_KM,
+        "fueltype": NSW_FUEL_TYPE,
+        "sortby": "Price",
+        "sortascending": True,
+    }
+    try:
+        resp = requests.post(
+            f"{NSW_FUEL_API_BASE}/FuelPriceCheck/v2/fuel/prices/nearby",
+            json=body,
+            headers=headers,
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        prices = [
+            entry["price"]
+            for entry in data.get("prices", [])
+            if entry.get("fueltype") == NSW_FUEL_TYPE and entry.get("price", 0) > 0
+        ]
+        if prices:
+            best = min(prices) / 100  # API returns cents → AUD
+            print(f"[FuelAPI] Live {NSW_FUEL_TYPE} price: AUD {best:.3f}/L "
+                  f"(cheapest of {len(prices)} stations within {NSW_FUEL_RADIUS_KM} km)")
+            return best
+        print(f"[FuelAPI] No prices returned — using fallback AUD {FUEL_PRICE_AUD_PER_L:.2f}/L")
+    except Exception as exc:
+        print(f"[FuelAPI] Price fetch failed: {exc} — using fallback AUD {FUEL_PRICE_AUD_PER_L:.2f}/L")
+    return FUEL_PRICE_AUD_PER_L
+
+
+# ── TomTom Traffic Flow ───────────────────────────────────────────────────────
+TOMTOM_API_KEY  = os.environ.get("TOMTOM_API_KEY", "sD3RvJ0k4XgWhasiF9J77mx0BEltD7xS")
+TOMTOM_FLOW_URL = "https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json"
+
+_tomtom_cache: dict = {}
+
+
+def get_tomtom_traffic_flow(lat: float, lon: float) -> dict | None:
+    """
+    Returns real-time traffic flow for the road segment nearest to (lat, lon).
+    Dict keys: factor (freeFlow/current ≥1 means congested), current_speed,
+               free_flow_speed, road_closure.
+    Returns None if the API call fails (simulation fallback applies).
+    """
+    cache_key = (round(lat, 3), round(lon, 3))   # ~100 m bucket
+    if cache_key in _tomtom_cache:
+        return _tomtom_cache[cache_key]
+    try:
+        resp = requests.get(
+            TOMTOM_FLOW_URL,
+            params={"point": f"{lat},{lon}", "key": TOMTOM_API_KEY, "unit": "KMPH"},
+            timeout=8,
+        )
+        resp.raise_for_status()
+        d = resp.json()["flowSegmentData"]
+        current   = max(d["currentSpeed"], 1)
+        free_flow = d["freeFlowSpeed"]
+        result = {
+            "factor":          free_flow / current,
+            "current_speed":   d["currentSpeed"],
+            "free_flow_speed": free_flow,
+            "road_closure":    d.get("roadClosure", False),
+        }
+        _tomtom_cache[cache_key] = result
+        return result
+    except Exception as exc:
+        print(f"[TomTom] flow fetch failed ({lat:.4f},{lon:.4f}): {exc}")
+        _tomtom_cache[cache_key] = None
+        return None
+
 
 RANKING_WEIGHTS = {
-    "Defect severity": 0.35,
+    "Defect severity": 0.45,
+    "Traffic exposure": 0.30,
     "Road importance": 0.25,
-    "Response urgency": 0.15,
-    "Traffic exposure": 0.15,
-    "Route efficiency": 0.10,
 }
 
 ROAD_IMPORTANCE = {
@@ -266,11 +383,9 @@ def hour_in_window(hour_value, *bounds):
 
 
 def service_time_minutes(num_potholes):
-    if num_potholes <= 2:
-        return 30
-    if num_potholes <= 10:
-        return 90
-    return 240
+    # Bergkamp SP5 spray-injection patcher: ~10 min/pothole (setup + inject + compact)
+    # plus 10 min fixed overhead per stop (cones, safety, debrief)
+    return 10 + num_potholes * 10
 
 
 def format_duration(minutes):
@@ -387,60 +502,81 @@ def add_display_offsets(df, key_cols=("lat", "lon"), precision=3, radius_m=42):
 def simulate_leg_conditions(row, leg_distance_m, leg_time_s, arrival_hour, stop_order):
     """leg_time_s: OSM-speed-based travel time in seconds (from time_matrix)."""
     triggers = []
-    factor = 1.0
 
-    school_peak = row["school_zone_candidate"] and hour_in_window(arrival_hour, *PEAK_WINDOWS["school_peak"])
-    work_peak = row["highway"] in {"motorway", "trunk", "primary", "secondary"} and hour_in_window(
-        arrival_hour, *PEAK_WINDOWS["work_peak"]
-    )
-    freight_peak = row["freight_corridor_candidate"] and hour_in_window(arrival_hour, *PEAK_WINDOWS["freight_peak"])
-    incident = stable_bucket(f"{row['defect_number']}-{stop_order}", 8) == 0
+    # ── TomTom real-time traffic (primary source) ─────────────────────────────
+    tomtom = get_tomtom_traffic_flow(row["lat"], row["lon"])
+    if tomtom is not None:
+        if tomtom["road_closure"]:
+            factor = 2.5
+            triggers.append("Road closure (TomTom live)")
+        else:
+            factor = tomtom["factor"]
+            spd = f"{tomtom['current_speed']} km/h (free-flow {tomtom['free_flow_speed']} km/h)"
+            if factor >= 1.45:
+                triggers.append(f"Heavy congestion — TomTom live: {spd}")
+            elif factor >= 1.20:
+                triggers.append(f"Moderate congestion — TomTom live: {spd}")
+            elif factor >= 1.05:
+                triggers.append(f"Light congestion — TomTom live: {spd}")
+            else:
+                triggers.append(f"Clear — TomTom live: {spd}")
+        data_source = "TomTom Live"
+    else:
+        # ── Fallback: time-based simulation ──────────────────────────────────
+        factor = 1.0
+        school_peak  = row["school_zone_candidate"] and hour_in_window(arrival_hour, *PEAK_WINDOWS["school_peak"])
+        work_peak    = row["highway"] in {"motorway", "trunk", "primary", "secondary"} and hour_in_window(
+            arrival_hour, *PEAK_WINDOWS["work_peak"])
+        freight_peak = row["freight_corridor_candidate"] and hour_in_window(arrival_hour, *PEAK_WINDOWS["freight_peak"])
+        incident     = stable_bucket(f"{row['defect_number']}-{stop_order}", 8) == 0
 
-    traffic_subtypes = []
-    if school_peak:
-        traffic_subtypes.append("school peak")
-        factor += 0.18
-    if work_peak:
-        traffic_subtypes.append("work commute")
-        factor += 0.12
-    if freight_peak:
-        traffic_subtypes.append("freight delivery")
-        factor += 0.10
-    if traffic_subtypes:
-        triggers.append(f"Traffic ({', '.join(traffic_subtypes)})")
-    if incident:
-        triggers.append("historical crash hotspot nearby")
-        factor += 0.22
+        traffic_subtypes = []
+        if school_peak:
+            traffic_subtypes.append("school peak"); factor += 0.18
+        if work_peak:
+            traffic_subtypes.append("work commute"); factor += 0.12
+        if freight_peak:
+            traffic_subtypes.append("freight delivery"); factor += 0.10
+        if traffic_subtypes:
+            triggers.append(f"Traffic ({', '.join(traffic_subtypes)}) — simulated")
+        if incident:
+            triggers.append("historical crash hotspot nearby — simulated"); factor += 0.22
+        data_source = "Simulated"
 
-    # Base time from OSM speed data (road-type-aware), not a blanket 40 km/h assumption
-    base_minutes = leg_time_s / 60
-    live_minutes = base_minutes * factor
+    base_minutes  = leg_time_s / 60
+    live_minutes  = base_minutes * factor
     delay_minutes = live_minutes - base_minutes
 
     if factor >= 1.45:
         traffic_state = "Heavy"
-        alert_level = "High"
+        alert_level   = "High"
     elif factor >= 1.20:
         traffic_state = "Moderate"
-        alert_level = "Medium"
+        alert_level   = "Medium"
     else:
         traffic_state = "Light"
-        alert_level = "Low"
+        alert_level   = "Low"
 
     if not triggers:
-        triggers = ["normal traffic conditions"]
+        triggers = [f"Normal traffic — {data_source}"]
+
+    current_spd   = tomtom["current_speed"]   if tomtom else None
+    free_flow_spd = tomtom["free_flow_speed"] if tomtom else None
 
     return {
-        "arrival_time": hour_to_label(arrival_hour),
-        "traffic_state": traffic_state,
-        "alert_level": alert_level,
-        "event_flags": ", ".join(triggers),
-        "alert_message": f"{alert_level} alert: {', '.join(triggers)}",
-        "base_travel_min": base_minutes,
+        "arrival_time":       hour_to_label(arrival_hour),
+        "traffic_state":      traffic_state,
+        "alert_level":        alert_level,
+        "event_flags":        ", ".join(triggers),
+        "alert_message":      f"{alert_level} alert: {', '.join(triggers)}",
+        "base_travel_min":    base_minutes,
         "simulated_travel_min": live_minutes,
-        "traffic_delay_min": delay_minutes,
-        "fuel_cost_aud": fuel_cost(leg_distance_m),
-        "fuel_litres": fuel_litres(leg_distance_m),
+        "traffic_delay_min":  delay_minutes,
+        "fuel_cost_aud":      fuel_cost(leg_distance_m),
+        "fuel_litres":        fuel_litres(leg_distance_m),
+        "current_speed_kmh":  current_spd,
+        "free_flow_speed_kmh": free_flow_spd,
+        "data_source":        data_source,
     }
 
 
@@ -458,21 +594,7 @@ def build_data_input_panel(alert_rows_html, defect_selector_html, departure_time
   <div class="panel-body">
 
   <div class="planner-section" style="padding-top:0;border-top:none;">
-    <div class="section-title section-title-row" onclick="toggleSection(this)">Step 1 — Departure Time<span class="section-arrow">▾</span></div>
-    <div class="section-body">
-    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-      <input id="departure-time-input" type="time" value="{departure_time_str}"
-             class="planner-input" style="width:120px;font-size:16px;font-weight:700;padding:8px 10px;">
-      <div style="font-size:12px;color:var(--text-soft);">
-        <span id="incident-active-count" style="font-weight:700;color:#d32f2f;">0</span>
-        of <span id="incident-total-count">{incident_total}</span> hotspots shown on map
-      </div>
-    </div>
-    </div>
-  </div>
-
-  <div class="planner-section">
-    <div class="section-title section-title-row" onclick="toggleSection(this)">Step 2 — Active Crash Hotspots<span class="section-arrow">▾</span></div>
+    <div class="section-title section-title-row" onclick="toggleSection(this)">Step 1 — Active Crash Hotspots<span class="section-arrow">▾</span></div>
     <div class="section-body">
     <div class="helper-text">
       Historical crash data covers 2024 ({incident_total} locations · est. <b>{expected_daily:.0f}</b> daily casualty events in area · source: NSW iROADS/Power BI).
@@ -510,33 +632,37 @@ def build_data_input_panel(alert_rows_html, defect_selector_html, departure_time
   <div class="planner-section">
     <div class="section-title section-title-row" onclick="toggleSection(this)">Step 4 — Priority Weights &amp; Generate Route<span class="section-arrow">▾</span></div>
     <div class="section-body">
-    <div class="helper-text">Adjust the importance of each factor, then click Generate Route.</div>
-    <div class="planner-weight-grid">
-      <label class="weight-control">
-        <span>Severity</span>
-        <input id="weight-severity" type="range" min="0" max="100" value="35">
-        <strong id="weight-severity-value">35%</strong>
-      </label>
-      <label class="weight-control">
-        <span>Road importance</span>
-        <input id="weight-road" type="range" min="0" max="100" value="25">
-        <strong id="weight-road-value">25%</strong>
-      </label>
-      <label class="weight-control">
-        <span>Urgency</span>
-        <input id="weight-urgency" type="range" min="0" max="100" value="15">
-        <strong id="weight-urgency-value">15%</strong>
-      </label>
-      <label class="weight-control">
-        <span>Traffic exposure</span>
-        <input id="weight-traffic" type="range" min="0" max="100" value="15">
-        <strong id="weight-traffic-value">15%</strong>
-      </label>
-      <label class="weight-control">
-        <span>Route efficiency</span>
-        <input id="weight-efficiency" type="range" min="0" max="100" value="10">
-        <strong id="weight-efficiency-value">10%</strong>
-      </label>
+    <div class="helper-text">Fixed priority weights (research-calibrated). Click Generate Route to compute the optimal order.</div>
+    <div style="margin:10px 0 4px;font-size:12px;font-weight:700;color:var(--text-soft);">Priority Factors</div>
+    <div style="display:grid;gap:6px;margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr 44px;align-items:center;font-size:12px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c62828;"></span>Defect Severity
+        </div><strong style="text-align:right;">45%</strong>
+      </div>
+      <div style="height:6px;border-radius:3px;background:linear-gradient(90deg,#c62828 45%,#e0e0e0 45%);margin:-2px 0 2px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 44px;align-items:center;font-size:12px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef8b1c;"></span>Traffic Exposure
+        </div><strong style="text-align:right;">30%</strong>
+      </div>
+      <div style="height:6px;border-radius:3px;background:linear-gradient(90deg,#ef8b1c 30%,#e0e0e0 30%);margin:-2px 0 2px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 44px;align-items:center;font-size:12px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1565c0;"></span>Road Importance
+        </div><strong style="text-align:right;">25%</strong>
+      </div>
+      <div style="height:6px;border-radius:3px;background:linear-gradient(90deg,#1565c0 25%,#e0e0e0 25%);margin:-2px 0 2px;"></div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:8px;margin-bottom:8px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text-soft);margin-bottom:4px;">Live Fuel Price (NSW FuelCheck API)</div>
+      <div style="display:flex;align-items:baseline;gap:6px;">
+        <span style="font-size:22px;font-weight:700;color:#2e7d32;">AUD {FUEL_PRICE_AUD_PER_L:.3f}</span>
+        <span style="font-size:11px;color:var(--text-soft);">/ L &nbsp;·&nbsp; Diesel (DL) &nbsp;·&nbsp; cheapest within 10 km of depot</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-soft);margin-top:2px;">
+        Vehicle: Bergkamp SP5 carrier &nbsp;·&nbsp; {FUEL_EFFICIENCY_L_PER_100KM:.0f} L/100 km (PTO load)
+      </div>
     </div>
     <div class="button-row">
       <button class="planner-btn planner-btn-primary" id="generate-custom-route">Generate Route</button>
@@ -568,8 +694,8 @@ def build_data_input_panel(alert_rows_html, defect_selector_html, departure_time
         <div style="margin-top:4px;font-size:11px;color:var(--text-soft);">
           Source: Central Coast Council iROADS road maintenance dataset, Charmhaven Zone, outstanding defects.
           Crash hotspot data: NSW iROADS / Power BI 2024.
-          Fuel estimate: {FUEL_EFFICIENCY_L_PER_100KM:.1f} L/100 km @ AUD {FUEL_PRICE_AUD_PER_L:.2f}/L
-          (ref: IPWEA Fleet Management Guidelines, light truck class).
+          Fuel estimate: {FUEL_EFFICIENCY_L_PER_100KM:.1f} L/100 km @ AUD {FUEL_PRICE_AUD_PER_L:.3f}/L
+          (vehicle: Bergkamp SP5 pothole patcher on carrier truck with PTO; live price from NSW FuelCheck API).
         </div>
       </div>
     </div>
@@ -579,6 +705,9 @@ def build_data_input_panel(alert_rows_html, defect_selector_html, departure_time
 </div>
 """
 
+
+print("Fetching live fuel price from NSW FuelCheck API...")
+FUEL_PRICE_AUD_PER_L = fetch_live_fuel_price(DEPOT_LAT, DEPOT_LON)
 
 print("Loading pothole dataset...")
 df = pd.read_csv(DATASET_PATH)
@@ -652,10 +781,8 @@ max_depot_leg_time = max(depot_leg_times.max(skipna=True), 1)
 pts["route_efficiency_score"] = (1 - (depot_leg_times / max_depot_leg_time)).fillna(0)
 pts["ranking_score"] = (
     pts["severity_score"] * RANKING_WEIGHTS["Defect severity"]
-    + pts["road_importance_score"] * RANKING_WEIGHTS["Road importance"]
-    + pts["urgency_score"] * RANKING_WEIGHTS["Response urgency"]
     + pts["traffic_exposure_score"] * RANKING_WEIGHTS["Traffic exposure"]
-    + pts["route_efficiency_score"] * RANKING_WEIGHTS["Route efficiency"]
+    + pts["road_importance_score"] * RANKING_WEIGHTS["Road importance"]
 )
 pts["ranking_score_pct"] = (pts["ranking_score"] * 100).round(1)
 pts["priority_band"] = pts["ranking_score_pct"].apply(classify_priority_band)
@@ -745,6 +872,9 @@ for leg_number, pts_i in enumerate(route_idx, start=1):
             "fuel_litres": round(traffic["fuel_litres"], 2),
             "fuel_cost_aud": round(traffic["fuel_cost_aud"], 2),
             "arrival_time": traffic["arrival_time"],
+            "current_speed_kmh":   traffic["current_speed_kmh"],
+            "free_flow_speed_kmh": traffic["free_flow_speed_kmh"],
+            "data_source":         traffic["data_source"],
             "cumulative_dist_km": round(cumulative_dist_m / 1000, 2),
             "cumulative_time_min": round(cumulative_time_min, 1),
             "lat": row["lat"],
@@ -804,10 +934,12 @@ if zone_hull.geom_type == "Polygon":
 route_lookup = {int(row["stop_order"]): row.to_dict() for _, row in route_df.iterrows()}
 segment_rows_html = []
 
+route_lines_group = folium.FeatureGroup(name="Route Lines", show=False)
+
 for leg_number in range(1, len(node_seq)):
     start_node = all_nodes[node_seq[leg_number - 1]]
-    end_node = all_nodes[node_seq[leg_number]]
-    stop_info = route_lookup.get(leg_number)
+    end_node   = all_nodes[node_seq[leg_number]]
+    stop_info  = route_lookup.get(leg_number)
     if stop_info is None:
         continue
     try:
@@ -819,7 +951,7 @@ for leg_number in range(1, len(node_seq)):
     if leg_number == 1:
         start_coord = (DEPOT_LAT, DEPOT_LON)
     else:
-        prev_stop = route_lookup.get(leg_number - 1)
+        prev_stop   = route_lookup.get(leg_number - 1)
         start_coord = (prev_stop["lat"], prev_stop["lon"]) if prev_stop else path_coords[0]
     end_coord = (stop_info["lat"], stop_info["lon"])
     path_coords = prepend_coord(path_coords, start_coord)
@@ -830,7 +962,7 @@ for leg_number in range(1, len(node_seq)):
         color="#ffffff",
         weight=8,
         opacity=0.7,
-    ).add_to(m)
+    ).add_to(route_lines_group)
     folium.PolyLine(
         path_coords,
         color=line_color,
@@ -842,7 +974,7 @@ for leg_number in range(1, len(node_seq)):
             f"{stop_info['simulated_travel_min']:.1f} min | "
             f"AUD {stop_info['fuel_cost_aud']:.2f}"
         ),
-    ).add_to(m)
+    ).add_to(route_lines_group)
 
     mid = midpoint(path_coords)
     show_segment_label = (
@@ -865,7 +997,10 @@ for leg_number in range(1, len(node_seq)):
                     f"L{leg_number}</div>"
                 )
             ),
-        ).add_to(m)
+        ).add_to(route_lines_group)
+
+route_lines_group.add_to(m)
+folium.LayerControl(collapsed=False).add_to(m)
 
 for _, row in route_df.iterrows():
     band_color = PRIORITY_COLORS[row["priority_band"]]
@@ -887,7 +1022,13 @@ for _, row in route_df.iterrows():
         f"<b>Traffic delay:</b> +{row['traffic_delay_min']:.1f} min<br>"
         f"<b>Service time on site:</b> {int(row['service_time_min'])} min<br>"
         f"<b>Fuel for this leg:</b> {row['fuel_litres']:.2f} L (AUD {row['fuel_cost_aud']:.2f})<br>"
-        f"<b>Traffic state:</b> {row['traffic_state']}<br>"
+        f"<b>Traffic source:</b> {row['data_source']}<br>"
+        + (
+            f"<b>Live speed:</b> {row['current_speed_kmh']} km/h &nbsp;|&nbsp; "
+            f"Free-flow: {row['free_flow_speed_kmh']} km/h<br>"
+            if row["current_speed_kmh"] is not None else ""
+        )
+        + f"<b>Traffic state:</b> {row['traffic_state']}<br>"
         f"<b>Alert:</b> {html.escape(row['alert_message'])}"
     )
     folium.Marker(
@@ -909,12 +1050,31 @@ for _, row in route_df.iterrows():
             )
         ),
     ).add_to(m)
+    # Traffic flow badge for dashboard
+    _state = row["traffic_state"]
+    _badge_color = {"Heavy": "#d32f2f", "Moderate": "#f57c00", "Light": "#2e7d32"}.get(_state, "#555")
+    if row["current_speed_kmh"] is not None:
+        _flow_cell = (
+            f"<span style='display:inline-block;background:{_badge_color};color:#fff;"
+            f"border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;"
+            f"white-space:nowrap;'>{_state}</span>"
+            f"<br><span style='font-size:11px;color:#555;'>"
+            f"{row['current_speed_kmh']}&thinsp;/&thinsp;{row['free_flow_speed_kmh']} km/h</span>"
+        )
+    else:
+        _flow_cell = (
+            f"<span style='display:inline-block;background:{_badge_color};color:#fff;"
+            f"border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;'>{_state}</span>"
+            f"<br><span style='font-size:11px;color:#aaa;'>simulated</span>"
+        )
+
     segment_rows_html.append(
         "<tr>"
         f"<td>{int(row['stop_order'])}</td>"
         f"<td style='white-space:normal;word-break:break-word;max-width:140px;'>{html.escape(row['road_name'] or 'Unnamed road')}</td>"
         f"<td>{row['leg_distance_km']:.2f} km</td>"
         f"<td>{row['simulated_travel_min']:.1f} min</td>"
+        f"<td style='min-width:110px;'>{_flow_cell}</td>"
         f"<td>AUD {row['fuel_cost_aud']:.2f}</td>"
         f"<td style='white-space:normal;word-break:break-word;max-width:200px;'>{html.escape(row['priority_reason'])}</td>"
         "</tr>"
@@ -992,7 +1152,7 @@ interactive_df["ui_label"] = interactive_df.apply(
     lambda row: f"{row['site_label']} | {row['specific_location']}",
     axis=1,
 )
-default_selected_ids = interactive_df.head(min(10, len(interactive_df))).index.tolist()
+default_selected_ids = []
 defect_selector_html = "".join(
     (
         f"<label class='selector-item'>"
@@ -1008,7 +1168,15 @@ if not defect_selector_html:
     defect_selector_html = "<div class='helper-text'>No existing defects available.</div>"
 
 interactive_route_records = []
+print("Fetching TomTom traffic flow for all defect sites...")
 for idx, row in interactive_df.iterrows():
+    tt = get_tomtom_traffic_flow(float(row["lat"]), float(row["lon"]))
+    if tt:
+        _tt_state = (
+            "Heavy"    if tt["factor"] >= 1.45 else
+            "Moderate" if tt["factor"] >= 1.20 else
+            "Light"
+        )
     interactive_route_records.append(
         {
             "id": idx,
@@ -1024,6 +1192,9 @@ for idx, row in interactive_df.iterrows():
             "route_efficiency_score": float(row["route_efficiency_score"]),
             "service_time_min": float(row["service_time_min"]),
             "num_potholes": int(row["num_potholes"]),
+            "current_speed_kmh":   tt["current_speed"]   if tt else None,
+            "free_flow_speed_kmh": tt["free_flow_speed"] if tt else None,
+            "traffic_state":       _tt_state             if tt else "Unknown",
         }
     )
 interactive_route_json = json.dumps(interactive_route_records)
@@ -1462,12 +1633,15 @@ legend_html = f"""
       <th align="left">Road</th>
       <th align="left">Leg</th>
       <th align="left">Drive</th>
+      <th align="left">Traffic Flow</th>
       <th align="left">Fuel</th>
       <th align="left">Priority reason</th>
     </tr>
     </thead>
     <tbody id="route-dashboard-tbody">
-    {''.join(segment_rows_html)}
+    <tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:16px;font-size:12px;">
+      Select sites and click Generate Route to see the route breakdown.
+    </td></tr>
     </tbody>
   </table>
   </div>
@@ -1500,33 +1674,12 @@ legend_html = f"""
     return null;
   }}
 
-  // ── Time helpers ─────────────────────────────────────────────────────────────
-  function getDepartureHour() {{
-    const input = document.getElementById('departure-time-input');
-    if (!input || !input.value) return {SIMULATION_START_HOUR};
-    const parts = input.value.split(':').map(Number);
-    return parts[0] + parts[1] / 60;
-  }}
-
+  // ── Time label helper (kept for display only) ────────────────────────────────
   function hourToLabel(h) {{
     const totalMin = Math.round(((h % 24) + 24) % 24 * 60);
     const hh = String(Math.floor(totalMin / 60)).padStart(2, '0');
     const mm = String(totalMin % 60).padStart(2, '0');
     return hh + ':' + mm;
-  }}
-
-  function hourInPeak(h, ...bounds) {{
-    if (bounds.length === 2) return h >= bounds[0] && h <= bounds[1];
-    return (h >= bounds[0] && h <= bounds[1]) || (h >= bounds[2] && h <= bounds[3]);
-  }}
-
-  // ── Traffic delay factor at a given hour ─────────────────────────────────────
-  function trafficFactor(arrivalHour) {{
-    let f = 1.0;
-    if (hourInPeak(arrivalHour, 7.0, 9.0, 14.5, 16.5)) f += 0.18;   // school peak
-    if (hourInPeak(arrivalHour, 7.0, 9.5, 16.0, 18.5)) f += 0.12;   // work peak
-    if (hourInPeak(arrivalHour, 9.0, 15.0))             f += 0.10;   // freight peak
-    return f;
   }}
 
   function trafficLabel(factor) {{
@@ -1713,26 +1866,16 @@ legend_html = f"""
     if (countEl) countEl.textContent = activeIncidents.length;
   }}
 
-  // ── Weights & scoring ─────────────────────────────────────────────────────────
+  // ── Weights & scoring (fixed — research-calibrated) ──────────────────────────
   function getWeights() {{
-    const raw = {{
-      severity:   Number(document.getElementById('weight-severity').value),
-      road:       Number(document.getElementById('weight-road').value),
-      urgency:    Number(document.getElementById('weight-urgency').value),
-      traffic:    Number(document.getElementById('weight-traffic').value),
-      efficiency: Number(document.getElementById('weight-efficiency').value),
-    }};
-    const total = Object.values(raw).reduce((s, v) => s + v, 0) || 1;
-    return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, v / total]));
+    return {{ severity: 0.45, traffic: 0.30, road: 0.25 }};
   }}
 
   function computePriorityScore(defect, weights) {{
     return (
-      defect.severity_score        * weights.severity +
-      defect.road_importance_score * weights.road +
-      defect.urgency_score         * weights.urgency +
+      defect.severity_score         * weights.severity +
       defect.traffic_exposure_score * weights.traffic +
-      defect.route_efficiency_score * weights.efficiency
+      defect.road_importance_score  * weights.road
     );
   }}
 
@@ -1742,9 +1885,8 @@ legend_html = f"""
     return existingDefects.filter((d) => selectedIds.includes(d.id));
   }}
 
-  // ── Route building with departure-time-aware traffic simulation ───────────────
+  // ── Route building using TomTom live traffic + incident congestion ───────────
   function buildWeightedRoute(selectedDefects, weights) {{
-    const departureHour = getDepartureHour();
     const remaining = selectedDefects.map((d) => ({{ ...d, priorityScore: computePriorityScore(d, weights) }}));
     const route = [];
     let current = depotPoint;
@@ -1766,17 +1908,17 @@ legend_html = f"""
       next.pathCoords = getRoadPath(currentKey, next.id) || [[current.lat, current.lon], [next.lat, next.lon]];
       next.legKm = pathDistanceKm(next.pathCoords);
 
-      const arrivalHour = departureHour + cumulativeMin / 60;
-      const tf  = trafficFactor(arrivalHour);
+      // TomTom live factor (free-flow / current); fall back to 1.0 if unavailable
+      const tomtomFactor = (next.current_speed_kmh != null && next.current_speed_kmh > 0)
+        ? next.free_flow_speed_kmh / next.current_speed_kmh
+        : 1.0;
       const inc = incidentCongestionForPath(next.pathCoords);
-      // Combine time-of-day traffic with incident congestion (multiplicative, capped at 2×)
-      const combinedFactor = Math.min(tf * inc, 2.0);
-      const baseDriveMin = next.legKm / 40 * 60;
+      const combinedFactor = Math.min(tomtomFactor * inc, 2.0);
+      const baseDriveMin = next.legKm / 30 * 60;   // 30 km/h base (SP5 operating speed)
       next.driveMin = baseDriveMin * combinedFactor;
       next.trafficFactor = combinedFactor;
       next.incidentDelay = inc > 1.0;
       next.trafficLabel = trafficLabel(combinedFactor);
-      next.arrivalTime = hourToLabel(arrivalHour);
       cumulativeMin += next.driveMin + next.service_time_min;
       totalKm += next.legKm;
       route.push(next);
@@ -1928,6 +2070,8 @@ legend_html = f"""
     if (map) map.getContainer().classList.remove('map-dimmed');
     resetInfoPanels();
     renderIncidentLayer();
+    const tbody = document.getElementById('route-dashboard-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-soft);padding:16px;font-size:12px;">Select sites and click Generate Route to see the route breakdown.</td></tr>';
   }}
 
   function updateCustomRouteSummary(result) {{
@@ -1936,10 +2080,8 @@ legend_html = f"""
       summary.innerHTML = 'Select at least 2 sites and click Generate Route.';
       return;
     }}
-    const depInput = document.getElementById('departure-time-input');
-    const depStr = depInput ? depInput.value : hourToLabel({SIMULATION_START_HOUR});
     summary.innerHTML =
-      '<b>Custom route — depart ' + depStr + '</b><br>' +
+      '<b>Custom route (TomTom live traffic)</b><br>' +
       '<span class="helper-text">Stops: ' + result.route.length +
       ' | Distance: ' + result.totalKm.toFixed(2) + ' km' +
       ' | Total time: ' + result.totalHours + 'h ' + result.totalMins + 'min (incl. service)</span>';
@@ -1950,26 +2092,27 @@ legend_html = f"""
       const fuelRate = {FUEL_EFFICIENCY_L_PER_100KM} / 100 * {FUEL_PRICE_AUD_PER_L};
       tbody.innerHTML = result.route.map((d, i) => {{
         const fuelAud = (d.legKm * fuelRate).toFixed(2);
+        // Traffic Flow cell: TomTom live if available, JS simulation as fallback
+        const stateLabel  = (d.current_speed_kmh != null) ? d.traffic_state : d.trafficLabel;
+        const badgeColor  = {{ Heavy: '#d32f2f', Moderate: '#f57c00', Light: '#2e7d32' }}[stateLabel] || '#888';
+        const speedLine   = (d.current_speed_kmh != null)
+          ? '<br><span style="font-size:11px;color:#555;">' + d.current_speed_kmh + '\u202f/\u202f' + d.free_flow_speed_kmh + ' km/h</span>'
+          : '<br><span style="font-size:11px;color:#aaa;">simulated</span>';
+        const flowCell =
+          '<span style="display:inline-block;background:' + badgeColor + ';color:#fff;' +
+          'border-radius:4px;padding:1px 6px;font-size:11px;font-weight:700;">' + stateLabel + '</span>' +
+          speedLine;
         return '<tr>' +
           '<td>' + (i + 1) + '</td>' +
           '<td style="white-space:normal;word-break:break-word;max-width:140px;">' + (d.specific_location || d.defect_number || '—') + '</td>' +
           '<td>' + d.legKm.toFixed(2) + ' km</td>' +
-          '<td>' + Math.round(d.driveMin) + ' min<br><span style="font-size:10px;color:#888;">' + d.trafficLabel + '</span></td>' +
+          '<td>' + Math.round(d.driveMin) + ' min</td>' +
+          '<td style="min-width:110px;">' + flowCell + '</td>' +
           '<td>AUD ' + fuelAud + '</td>' +
           '<td style="white-space:normal;word-break:break-word;max-width:200px;">Score ' + (d.priorityScore * 100).toFixed(1) + '/100</td>' +
           '</tr>';
       }}).join('');
     }}
-  }}
-
-  function syncWeightLabels() {{
-    [['weight-severity','weight-severity-value'],['weight-road','weight-road-value'],
-     ['weight-urgency','weight-urgency-value'],['weight-traffic','weight-traffic-value'],
-     ['weight-efficiency','weight-efficiency-value']].forEach(([iId, lId]) => {{
-      const inp = document.getElementById(iId);
-      const lbl = document.getElementById(lId);
-      if (inp && lbl) lbl.textContent = inp.value + '%';
-    }});
   }}
 
   function generateCustomRoute() {{
@@ -2028,10 +2171,6 @@ legend_html = f"""
 
   // ── Bootstrap ─────────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {{
-    syncWeightLabels();
-    document.querySelectorAll('.weight-control input[type=range]').forEach((inp) => {{
-      inp.addEventListener('input', syncWeightLabels);
-    }});
 
     // Make Route Dashboard, Legend and Route Planner sidebar draggable
     document.querySelectorAll('.planner-card-bottom, .planner-map-legend, .planner-sidebar').forEach(makeDraggable);
@@ -2079,13 +2218,6 @@ legend_html = f"""
       }});
     }}
 
-    const depInput = document.getElementById('departure-time-input');
-    if (depInput) {{
-      depInput.addEventListener('change', () => {{
-        updateIncidents();
-        generateCustomRoute();
-      }});
-    }}
 
     // Incident count slider — update label live, apply deterministically on input
     const incSlider = document.getElementById('incident-count-slider');
