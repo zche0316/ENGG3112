@@ -7,6 +7,7 @@ This project focuses on optimizing the maintenance operations for road defects i
 Prioritizing road defect remediation: Given a list of road defects based on an overall priority risk rating, what is the optimum path for a maintenance crew to follow to minimize the time to complete the works, whilst ensuring the highest order defects are addressed first?
 
 This problem is further complicated by variables such as:
+
 - The need for traffic control.
 - Different types of maintenance treatments (e.g., temporary patching, semi-permanent repairs, or heavy patching).
 - Avoiding scheduling works during peak traffic periods.
